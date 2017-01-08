@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Newsreader</string>
+    <string name="none">None</string>
+
+    <string name="error_loading">Error while loading.</string>
+    <string name="error_loading_retry">Error while loading countries. Click here to retry.</string>
+</resources>
