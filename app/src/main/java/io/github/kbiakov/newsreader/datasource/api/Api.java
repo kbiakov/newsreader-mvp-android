@@ -3,11 +3,13 @@ package io.github.kbiakov.newsreader.datasource.api;
 import android.support.annotation.NonNull;
 
 import com.github.aurae.retrofit2.LoganSquareConverterFactory;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.concurrent.TimeUnit;
 
 import io.github.kbiakov.newsreader.datasource.api.interceptors.AuthInterceptor;
 import io.github.kbiakov.newsreader.datasource.api.interceptors.LoggingInterceptor;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
@@ -53,6 +55,7 @@ public class Api {
     private Retrofit getRetrofit() {
         return new Retrofit.Builder()
                 .baseUrl(ApiService.API_ENDPOINT)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .addConverterFactory(LoganSquareConverterFactory.create())
                 .client(CLIENT)
                 .build();

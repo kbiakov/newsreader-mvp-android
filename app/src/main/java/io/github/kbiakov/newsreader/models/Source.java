@@ -5,7 +5,6 @@ import android.os.Parcelable;
 import com.bluelinelabs.logansquare.annotation.JsonField;
 import com.bluelinelabs.logansquare.annotation.JsonObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.requery.Entity;
@@ -26,8 +25,8 @@ public abstract class Source implements Parcelable, Persistable {
 
     @JsonObject @Entity
     public static abstract class ImageUrl implements Parcelable, Persistable {
-        public @JsonField String small;
-        public @JsonField String medium;
-        public @JsonField String large;
+        public String small;
+        public String medium;
+        public String large;
     }
 }

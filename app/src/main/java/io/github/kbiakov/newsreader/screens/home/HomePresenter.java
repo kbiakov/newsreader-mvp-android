@@ -1,5 +1,7 @@
 package io.github.kbiakov.newsreader.screens.home;
 
+import android.util.Log;
+
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.util.ArrayList;
@@ -20,7 +22,20 @@ class HomePresenter extends MvpBasePresenter<HomeView> {
             getView().showLoading(pullToRefresh);
         }
 
-        getSources()
+        DataSource.api()
+                .getSources(null, null, null)
+                .map(SourcesResponse::getData)
+                .doOnNext(this::saveSources)
+                .doOnNext(s -> {
+                    Log.i("!!!", s.size() + "");
+                    Source s1 = s.get(0);
+
+                    if (s1 != null) {
+                        Log.i("!!!", s1.name);
+                    } else {
+                        Log.i("!!!", "QWEQWEEQEQEEQWEQWEQWEQWE");
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(s -> {

@@ -27,8 +27,7 @@ import io.github.kbiakov.newsreader.screens.webpage.WebpageController;
 public class ArticlesController extends MvpLceViewStateController<SwipeRefreshLayout, List<Article>, ArticlesView, ArticlesPresenter>
         implements ArticlesView, SwipeRefreshLayout.OnRefreshListener {
 
-    @BindView(R.id.rv_sources)
-    private RecyclerView rvSources;
+    private @BindView(R.id.rvArticles) RecyclerView rvArticles;
     private ArticlesAdapter adapter;
     private String sourceId;
 
@@ -44,14 +43,14 @@ public class ArticlesController extends MvpLceViewStateController<SwipeRefreshLa
     @NonNull
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        View view = inflater.inflate(R.layout.controller_home, container, false);
+        View view = inflater.inflate(R.layout.controller_articles, container, false);
         ButterKnife.bind(this, view);
 
         contentView.setOnRefreshListener(this);
 
         adapter = new ArticlesAdapter(DataSource.emptyArticles(), url -> presenter.onArticleSelected(url));
-        rvSources.setLayoutManager(new LinearLayoutManager(getActivity()));
-        rvSources.setAdapter(adapter);
+        rvArticles.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rvArticles.setAdapter(adapter);
 
         loadData(false);
 

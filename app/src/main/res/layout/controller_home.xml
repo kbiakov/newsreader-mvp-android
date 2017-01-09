@@ -20,9 +20,10 @@
         android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_sources"
+            android:id="@+id/rvSources"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/card_radius"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

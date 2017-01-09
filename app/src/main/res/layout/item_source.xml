@@ -3,19 +3,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginRight="@dimen/card_radius"
+    android:layout_marginBottom="@dimen/card_radius">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/sdv_cover"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        fresco:placeholderImage="@drawable/placeholder"/>
+        fresco:placeholderImage="@color/cardview_shadow_start_color"/>
 
     <TextView
         android:id="@+id/tv_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/activity_horizontal_margin"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/sdv_cover"/>
 
 </io.github.kbiakov.newsreader.views.SquareRelativeLayout>
