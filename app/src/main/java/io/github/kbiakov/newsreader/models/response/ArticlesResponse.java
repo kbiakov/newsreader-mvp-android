@@ -5,16 +5,16 @@ import com.bluelinelabs.logansquare.annotation.JsonObject;
 
 import java.util.List;
 
-import io.github.kbiakov.newsreader.models.entities.Article;
+import io.github.kbiakov.newsreader.models.json.ArticleJson;
 
 @JsonObject
-public class ArticlesResponse extends Response<Article> {
+public class ArticlesResponse extends Response<ArticleJson> {
     @JsonField String source;
     @JsonField String sortBy;
-    @JsonField List<Article> articles;
+    @JsonField List<ArticleJson> articles;
 
     @Override
-    public List<Article> getData() throws RuntimeException {
+    public List<ArticleJson> getData() throws RuntimeException {
         checkStatus();
         return articles;
     }

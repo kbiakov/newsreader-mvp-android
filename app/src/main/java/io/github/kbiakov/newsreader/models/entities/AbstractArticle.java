@@ -2,8 +2,6 @@ package io.github.kbiakov.newsreader.models.entities;
 
 import android.os.Parcelable;
 
-import com.bluelinelabs.logansquare.annotation.JsonField;
-
 import io.github.kbiakov.newsreader.models.json.ArticleJson;
 import io.requery.Entity;
 import io.requery.Key;
