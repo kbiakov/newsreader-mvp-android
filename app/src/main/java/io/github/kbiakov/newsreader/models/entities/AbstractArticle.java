@@ -9,5 +9,9 @@ import io.requery.Persistable;
 
 @Entity
 public abstract class AbstractArticle extends ArticleJson implements Parcelable, Persistable {
-    @Key public String url;
+    @Key public String sourceId;
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
+    }
 }

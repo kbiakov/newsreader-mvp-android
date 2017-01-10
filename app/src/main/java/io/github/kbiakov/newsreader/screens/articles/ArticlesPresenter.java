@@ -13,7 +13,6 @@ import io.github.kbiakov.newsreader.models.response.SortBy;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
@@ -47,24 +46,27 @@ class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
     private Single<List<Article>> getArticles(String sourceId) {
         Observable<List<Article>> db = Observable.defer(() -> Observable.just(DataSource.db()
                 .select(Article.class)
-                //.where(Article.SOURCE_ID.equals(sourceId)) // TODO
+                .where(Article.SOURCE_ID.eq(sourceId))
                 .get()
                 .toList()));
 
         Observable<List<Article>> api = DataSource.api()
                 .getArticles(sourceId, SortBy.TOP)
                 .map(ArticlesResponse::getData)
-                .flatMap(as -> Observable.fromArray(as)
-                .map(a -> (Article) a))
-                .doOnNext(this::saveArticles);
+                .map(a -> toEntity(a, sourceId))
+                .doOnNext(DataSource::saveArticles);
 
         return Observable.concat(db, api)
                 .first(DataSource.emptyArticles());
     }
 
-    private Observable<Iterable<Article>> saveArticles(Iterable<Article> articles) {
-        return DataSource.db()
-                .insert(articles)
-                .toObservable();
+    private List<Article> toEntity(List<ArticleJson> articles, String sourceId) {
+        List<Article> res = new ArrayList<>();
+        for (ArticleJson json: articles) {
+            Article a = (Article) json;
+            a.setSourceId(sourceId);
+            res.add(a);
+        }
+        return res;
     }
 }
