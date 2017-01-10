@@ -2,22 +2,21 @@ package io.github.kbiakov.newsreader.screens.webpage;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import com.hannesdorfmann.mosby.mvp.conductor.MvpController;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.github.kbiakov.newsreader.R;
 
-public class WebpageController extends MvpController<WebpageView, WebpagePresenter> {
+public class WebpageController extends MvpController<WebpageView, WebpagePresenter> implements WebpageView {
 
-    @BindView(R.id.wv_page)
     private WebView wvPage;
+    private ProgressBar pbLoading;
     private String articleUrl;
 
     public WebpageController(String articleUrl) {
@@ -33,8 +32,19 @@ public class WebpageController extends MvpController<WebpageView, WebpagePresent
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         View view = inflater.inflate(R.layout.controller_webpage, container, false);
-        ButterKnife.bind(this, view);
-        wvPage.loadUrl(articleUrl);
+
+        pbLoading = (ProgressBar) view.findViewById(R.id.pb_loading);
+
+        wvPage = (WebView) view.findViewById(R.id.wv_page);
+        wvPage.getSettings().setJavaScriptEnabled(true);
+        wvPage.setWebViewClient(new WebViewClient() {
+            public void onPageFinished(WebView view, String url) {
+                presenter.onPageLoaded();
+            }
+        });
+
+        presenter.loadPage(articleUrl);
+
         return view;
     }
 
@@ -42,5 +52,16 @@ public class WebpageController extends MvpController<WebpageView, WebpagePresent
     @Override
     public WebpagePresenter createPresenter() {
         return new WebpagePresenter();
+    }
+
+    @Override
+    public void loadUrl(String url) {
+        pbLoading.setVisibility(View.VISIBLE);
+        wvPage.loadUrl(articleUrl);
+    }
+
+    @Override
+    public void hideLoading() {
+        pbLoading.setVisibility(View.INVISIBLE);
     }
 }

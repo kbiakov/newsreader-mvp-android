@@ -4,7 +4,7 @@ import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
 
 import java.util.List;
 
-import io.github.kbiakov.newsreader.models.Article;
+import io.github.kbiakov.newsreader.models.entities.Article;
 
 interface ArticlesView extends MvpLceView<List<Article>> {
     void showArticle(String articleUrl);

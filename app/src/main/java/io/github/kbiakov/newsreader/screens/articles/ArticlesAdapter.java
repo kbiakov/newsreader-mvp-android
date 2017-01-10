@@ -5,16 +5,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.github.kbiakov.newsreader.R;
-import io.github.kbiakov.newsreader.models.Article;
+import io.github.kbiakov.newsreader.models.entities.Article;
 
 class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHolder>{
 
@@ -36,13 +35,16 @@ class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Article item = mArticles.get(position);
-        holder.mItem = item;
+        holder.mArticle = item;
 
         Uri uri = Uri.parse(item.urlToImage);
         holder.sdvCover.setImageURI(uri);
+        holder.ivNoPhoto.setVisibility(View.GONE);
+
+        holder.tvAuthor.setText(item.author);
+        holder.tvAuthor.setVisibility(item.author == null ? View.GONE : View.VISIBLE);
 
         holder.tvTitle.setText(item.title);
-        holder.tvAuthor.setText(item.author);
         holder.tvDescription.setText(item.description);
 
         holder.mView.setOnClickListener(v ->
@@ -64,18 +66,23 @@ class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHolder>{
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.sdv_cover) SimpleDraweeView sdvCover;
-        @BindView(R.id.tv_title) TextView tvTitle;
-        @BindView(R.id.tv_author) TextView tvAuthor;
-        @BindView(R.id.tv_description) TextView tvDescription;
+        SimpleDraweeView sdvCover;
+        ImageView ivNoPhoto;
+        TextView tvTitle;
+        TextView tvAuthor;
+        TextView tvDescription;
 
         final View mView;
-        Article mItem;
+        Article mArticle;
 
         ViewHolder(View view) {
             super(view);
             mView = view;
-            ButterKnife.bind(this, view);
+            sdvCover = (SimpleDraweeView) view.findViewById(R.id.sdv_cover);
+            ivNoPhoto = (ImageView) view.findViewById(R.id.iv_no_photo);
+            tvTitle = (TextView) view.findViewById(R.id.tv_title);
+            tvAuthor = (TextView) view.findViewById(R.id.tv_author);
+            tvDescription = (TextView) view.findViewById(R.id.tv_description);
         }
 
         @Override

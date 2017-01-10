@@ -11,10 +11,8 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.github.kbiakov.newsreader.R;
-import io.github.kbiakov.newsreader.models.Source;
+import io.github.kbiakov.newsreader.models.entities.Source;
 
 class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.ViewHolder>{
 
@@ -38,7 +36,7 @@ class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.ViewHolder>{
         Source item = mSources.get(position);
         holder.mItem = item;
 
-        Uri uri = Uri.parse(item.urlsToLogos.medium);
+        Uri uri = Uri.parse(item.getImageUrl());
         holder.sdvCover.setImageURI(uri);
 
         holder.tvName.setText(item.name);
@@ -62,8 +60,8 @@ class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.ViewHolder>{
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.sdv_cover) SimpleDraweeView sdvCover;
-        @BindView(R.id.tv_name) TextView tvName;
+        SimpleDraweeView sdvCover;
+        TextView tvName;
 
         final View mView;
         Source mItem;
@@ -71,7 +69,8 @@ class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.ViewHolder>{
         ViewHolder(View view) {
             super(view);
             mView = view;
-            ButterKnife.bind(this, view);
+            sdvCover = (SimpleDraweeView) view.findViewById(R.id.sdv_cover);
+            tvName = (TextView) view.findViewById(R.id.tv_name);
         }
 
         @Override

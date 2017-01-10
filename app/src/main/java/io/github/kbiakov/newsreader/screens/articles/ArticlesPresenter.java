@@ -5,7 +5,7 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import java.util.List;
 
 import io.github.kbiakov.newsreader.datasource.DataSource;
-import io.github.kbiakov.newsreader.models.Article;
+import io.github.kbiakov.newsreader.models.entities.Article;
 import io.github.kbiakov.newsreader.models.response.ArticlesResponse;
 import io.github.kbiakov.newsreader.models.response.SortBy;
 import io.reactivex.Observable;
@@ -20,7 +20,7 @@ class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
             getView().showLoading(pullToRefresh);
         }
 
-        getArticlesFromNetwork(sourceId)
+        getArticles(sourceId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(s -> {
@@ -41,14 +41,6 @@ class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
         }
     }
 
-    private Observable<List<Article>> getArticlesFromNetwork(String sourceId) {
-        return DataSource.api()
-                .getArticles(sourceId, SortBy.TOP)
-                .map(ArticlesResponse::getData)
-                .doOnNext(this::saveArticles);
-    }
-
-    /*
     private Single<List<Article>> getArticles(String sourceId) {
         Observable<List<Article>> db = Observable.defer(() -> Observable.just(DataSource.db()
                 .select(Article.class)
@@ -56,12 +48,14 @@ class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
                 .get()
                 .toList()));
 
-        Observable<List<Article>> api = getArticlesFromNetwork(sourceId);
+        Observable<List<Article>> api = DataSource.api()
+                .getArticles(sourceId, SortBy.TOP)
+                .map(ArticlesResponse::getData)
+                .doOnNext(this::saveArticles);;
 
         return Observable.concat(db, api)
                 .first(DataSource.emptyArticles());
     }
-    */
 
     private Observable<Iterable<Article>> saveArticles(Iterable<Article> articles) {
         return DataSource.db()

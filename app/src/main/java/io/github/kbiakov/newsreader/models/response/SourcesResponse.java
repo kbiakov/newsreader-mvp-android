@@ -5,7 +5,7 @@ import com.bluelinelabs.logansquare.annotation.JsonObject;
 
 import java.util.List;
 
-import io.github.kbiakov.newsreader.models.Source;
+import io.github.kbiakov.newsreader.models.entities.Source;
 
 @JsonObject
 public class SourcesResponse extends Response<Source> {

@@ -1,15 +1,10 @@
-package io.github.kbiakov.newsreader.models;
-
-import android.os.Parcelable;
+package io.github.kbiakov.newsreader.models.json;
 
 import com.bluelinelabs.logansquare.annotation.JsonField;
 import com.bluelinelabs.logansquare.annotation.JsonObject;
 
-import io.requery.Entity;
-import io.requery.Persistable;
-
-@JsonObject @Entity
-public abstract class Article implements Parcelable, Persistable {
+@JsonObject
+public class ArticleJson {
     public @JsonField String author;
     public @JsonField String title;
     public @JsonField String description;

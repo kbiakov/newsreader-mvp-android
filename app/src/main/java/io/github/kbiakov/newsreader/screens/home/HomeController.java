@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +21,7 @@ import butterknife.ButterKnife;
 import io.github.kbiakov.newsreader.datasource.DataSource;
 import io.github.kbiakov.newsreader.screens.articles.ArticlesController;
 import io.github.kbiakov.newsreader.R;
-import io.github.kbiakov.newsreader.models.Source;
+import io.github.kbiakov.newsreader.models.entities.Source;
 
 public class HomeController extends MvpLceViewStateController<SwipeRefreshLayout, List<Source>, HomeView, HomePresenter>
         implements HomeView, SwipeRefreshLayout.OnRefreshListener {
@@ -40,14 +39,13 @@ public class HomeController extends MvpLceViewStateController<SwipeRefreshLayout
         errorView = (TextView) view.findViewById(R.id.errorView);
 
         adapter = new SourcesAdapter(DataSource.emptySources(),
-                id -> presenter.onSourceSelected(id));
+                id -> presenter.onSourceSelected(id)
+        );
 
         RecyclerView rvSources = (RecyclerView) view.findViewById(R.id.rvSources);
         rvSources.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         rvSources.setHasFixedSize(true);
         rvSources.setAdapter(adapter);
-
-        //loadData(false);
 
         return view;
     }

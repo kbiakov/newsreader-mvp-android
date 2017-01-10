@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler;
@@ -17,17 +18,14 @@ import com.hannesdorfmann.mosby.mvp.viewstate.lce.data.RetainingLceViewState;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.github.kbiakov.newsreader.R;
 import io.github.kbiakov.newsreader.datasource.DataSource;
-import io.github.kbiakov.newsreader.models.Article;
+import io.github.kbiakov.newsreader.models.entities.Article;
 import io.github.kbiakov.newsreader.screens.webpage.WebpageController;
 
 public class ArticlesController extends MvpLceViewStateController<SwipeRefreshLayout, List<Article>, ArticlesView, ArticlesPresenter>
         implements ArticlesView, SwipeRefreshLayout.OnRefreshListener {
 
-    private @BindView(R.id.rvArticles) RecyclerView rvArticles;
     private ArticlesAdapter adapter;
     private String sourceId;
 
@@ -44,15 +42,19 @@ public class ArticlesController extends MvpLceViewStateController<SwipeRefreshLa
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         View view = inflater.inflate(R.layout.controller_articles, container, false);
-        ButterKnife.bind(this, view);
 
+        contentView = (SwipeRefreshLayout) view.findViewById(R.id.contentView);
         contentView.setOnRefreshListener(this);
 
-        adapter = new ArticlesAdapter(DataSource.emptyArticles(), url -> presenter.onArticleSelected(url));
+        errorView = (TextView) view.findViewById(R.id.errorView);
+
+        adapter = new ArticlesAdapter(DataSource.emptyArticles(),
+                url -> presenter.onArticleSelected(url)
+        );
+
+        RecyclerView rvArticles = (RecyclerView) view.findViewById(R.id.rvArticles);
         rvArticles.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvArticles.setAdapter(adapter);
-
-        loadData(false);
 
         return view;
     }

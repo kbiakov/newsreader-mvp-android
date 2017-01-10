@@ -8,6 +8,8 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
+import butterknife.ButterKnife;
+
 public class MyApplication extends Application {
 
     private RefWatcher refWatcher;

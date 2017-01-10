@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import io.github.kbiakov.newsreader.BuildConfig;
-import io.github.kbiakov.newsreader.models.Models;
+import io.github.kbiakov.newsreader.models.entities.Models;
 import io.requery.Persistable;
 import io.requery.android.sqlite.DatabaseSource;
 import io.requery.reactivex.ReactiveEntityStore;
