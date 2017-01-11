@@ -1,5 +1,7 @@
 package io.github.kbiakov.newsreader.datasource;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +10,7 @@ import io.github.kbiakov.newsreader.datasource.api.ApiService;
 import io.github.kbiakov.newsreader.datasource.db.DbManager;
 import io.github.kbiakov.newsreader.models.entities.Article;
 import io.github.kbiakov.newsreader.models.entities.Source;
-import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 import io.requery.Persistable;
 import io.requery.reactivex.ReactiveEntityStore;
 
@@ -30,11 +32,11 @@ public class DataSource {
         return new ArrayList<>();
     }
 
-    public static Observable<Iterable<Source>> saveSources(List<Source> data) {
-        return db().insert(data).toObservable();
+    public static Disposable saveSources(List<Source> data) {
+        return db().insert(data).subscribe();
     }
 
-    public static Observable<Iterable<Article>> saveArticles(List<Article> data) {
-        return db().insert(data).toObservable();
+    public static Disposable saveArticles(List<Article> data) {
+        return db().insert(data).subscribe();
     }
 }

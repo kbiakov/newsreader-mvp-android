@@ -1,5 +1,7 @@
 package io.github.kbiakov.newsreader.screens.home;
 
+import android.util.Log;
+
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.util.ArrayList;
@@ -22,9 +24,32 @@ class HomePresenter extends MvpBasePresenter<HomeView> {
             getView().showLoading(pullToRefresh);
         }
 
-        getSources()
+        getFromNetwork()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
+                .doOnNext(s -> {
+                    Log.e("!!!", s.size() + "");
+
+                    for (Source source : s) {
+                        if (source == null) {
+                            Log.e("***", "Source is null! =(");
+                            continue;
+                        }
+                        try {
+                            Log.e("***", source.name);
+                        } catch (NullPointerException e) {
+                            Log.e("***", "Name not readed");
+                        }
+                    }
+
+                    Log.e("***", "1");
+
+                    getFromDb().subscribe(asds -> {
+                        Log.e("!!!", "Saved: " + asds.size());
+                    });
+
+                    Log.e("***", "2");
+                })
                 .subscribe(s -> {
                     if (isViewAttached()) {
                         getView().setData(s);
@@ -43,26 +68,30 @@ class HomePresenter extends MvpBasePresenter<HomeView> {
         }
     }
 
-    private Single<List<Source>> getSources() {
-        Observable<List<Source>> db = Observable.defer(() -> Observable.just(DataSource.db()
+    private Observable<List<Source>> getFromDb() {
+        return Observable.just(DataSource.db()
                 .select(Source.class)
                 .get()
-                .toList()));
+                .toList());
+    }
 
-        Observable<List<Source>> api = DataSource.api()
+    private Observable<List<Source>> getFromNetwork() {
+        return DataSource.api()
                 .getSources(null, null, null)
                 .map(SourcesResponse::getData)
                 .map(this::toEntity)
                 .doOnNext(DataSource::saveSources);
+    }
 
-        return Observable.concat(db, api)
+    private Single<List<Source>> getSources() {
+        return Observable.concat(getFromDb(), getFromNetwork())
                 .first(DataSource.emptySources());
     }
 
-    private List<Source> toEntity(List<SourceJson> sourcesJson) {
+    private List<Source> toEntity(List<SourceJson> sourceJsons) {
         List<Source> res = new ArrayList<>();
-        for (SourceJson json : sourcesJson) {
-            res.add((Source) json);
+        for (SourceJson json : sourceJsons) {
+            res.add(json.toEntity());
         }
         return res;
     }
