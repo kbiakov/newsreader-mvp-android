@@ -11,13 +11,12 @@ import io.github.kbiakov.newsreader.models.json.ArticleJson;
 import io.github.kbiakov.newsreader.models.response.ArticlesResponse;
 import io.github.kbiakov.newsreader.models.response.SortBy;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
 
-    // - interface
+    // - Interface
 
     void loadArticles(boolean pullToRefresh, String sourceId) {
         if (isViewAttached()) {
@@ -47,9 +46,8 @@ class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
 
     // - Data source
 
-    private Single<List<Article>> getArticles(String sourceId) {
-        return Observable.concat(getFromDb(sourceId), getFromNetwork(sourceId))
-                .first(DataSource.emptyArticles());
+    private Observable<List<Article>> getArticles(String sourceId) {
+        return Observable.concat(getFromDb(sourceId), getFromNetwork(sourceId));
     }
 
     private Observable<List<Article>> getFromDb(String sourceId) {

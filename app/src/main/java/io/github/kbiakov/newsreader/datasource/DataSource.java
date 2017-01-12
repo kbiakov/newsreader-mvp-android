@@ -1,7 +1,5 @@
 package io.github.kbiakov.newsreader.datasource;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,10 +31,10 @@ public class DataSource {
     }
 
     public static Disposable saveSources(List<Source> data) {
-        return db().insert(data).subscribe();
+        return db().upsert(data).subscribe();
     }
 
     public static Disposable saveArticles(List<Article> data) {
-        return db().insert(data).subscribe();
+        return db().upsert(data).subscribe();
     }
 }

@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.github.kbiakov.newsreader.datasource.DataSource;
@@ -13,7 +12,6 @@ import io.github.kbiakov.newsreader.models.json.SourceJson;
 import io.github.kbiakov.newsreader.models.response.SourcesResponse;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -25,6 +23,7 @@ class HomePresenter extends MvpBasePresenter<HomeView> {
         if (isViewAttached()) {
             getView().showLoading(pullToRefresh);
         }
+
         getSources()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -48,9 +47,8 @@ class HomePresenter extends MvpBasePresenter<HomeView> {
 
     // - Data source
 
-    private Single<List<Source>> getSources() {
-        return Observable.concat(getFromDb(), getFromNetwork())
-                .first(DataSource.emptySources());
+    private Observable<List<Source>> getSources() {
+        return Observable.concat(getFromDb(), getFromNetwork());
     }
 
     private Observable<List<Source>> getFromDb() {
