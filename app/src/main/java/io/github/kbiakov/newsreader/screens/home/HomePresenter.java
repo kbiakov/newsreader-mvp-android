@@ -19,37 +19,15 @@ import io.reactivex.schedulers.Schedulers;
 
 class HomePresenter extends MvpBasePresenter<HomeView> {
 
+    // - Interface
+
     void loadSources(final boolean pullToRefresh) {
         if (isViewAttached()) {
             getView().showLoading(pullToRefresh);
         }
-
-        getFromNetwork()
+        getSources()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .doOnNext(s -> {
-                    Log.e("!!!", s.size() + "");
-
-                    for (Source source : s) {
-                        if (source == null) {
-                            Log.e("***", "Source is null! =(");
-                            continue;
-                        }
-                        try {
-                            Log.e("***", source.name);
-                        } catch (NullPointerException e) {
-                            Log.e("***", "Name not readed");
-                        }
-                    }
-
-                    Log.e("***", "1");
-
-                    getFromDb().subscribe(asds -> {
-                        Log.e("!!!", "Saved: " + asds.size());
-                    });
-
-                    Log.e("***", "2");
-                })
                 .subscribe(s -> {
                     if (isViewAttached()) {
                         getView().setData(s);
@@ -68,31 +46,27 @@ class HomePresenter extends MvpBasePresenter<HomeView> {
         }
     }
 
-    private Observable<List<Source>> getFromDb() {
-        return Observable.just(DataSource.db()
-                .select(Source.class)
-                .get()
-                .toList());
-    }
-
-    private Observable<List<Source>> getFromNetwork() {
-        return DataSource.api()
-                .getSources(null, null, null)
-                .map(SourcesResponse::getData)
-                .map(this::toEntity)
-                .doOnNext(DataSource::saveSources);
-    }
+    // - Data source
 
     private Single<List<Source>> getSources() {
         return Observable.concat(getFromDb(), getFromNetwork())
                 .first(DataSource.emptySources());
     }
 
-    private List<Source> toEntity(List<SourceJson> sourceJsons) {
-        List<Source> res = new ArrayList<>();
-        for (SourceJson json : sourceJsons) {
-            res.add(json.toEntity());
-        }
-        return res;
+    private Observable<List<Source>> getFromDb() {
+        return DataSource.db()
+                .select(Source.class)
+                .get()
+                .observable()
+                .toList()
+                .toObservable();
+    }
+
+    private Observable<List<Source>> getFromNetwork() {
+        return DataSource.api()
+                .getSources(null, null, null)
+                .map(SourcesResponse::getData)
+                .map(SourceJson::asEntities)
+                .doOnNext(DataSource::saveSources);
     }
 }

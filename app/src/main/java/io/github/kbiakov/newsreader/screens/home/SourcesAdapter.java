@@ -13,6 +13,7 @@ import java.util.List;
 
 import io.github.kbiakov.newsreader.R;
 import io.github.kbiakov.newsreader.models.entities.Source;
+import io.github.kbiakov.newsreader.models.json.ImageUrlJson;
 
 class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.ViewHolder>{
 
@@ -36,13 +37,13 @@ class SourcesAdapter extends RecyclerView.Adapter<SourcesAdapter.ViewHolder>{
         Source item = mSources.get(position);
         holder.mItem = item;
 
-        Uri uri = Uri.parse(item.getImageUrl());
-        holder.sdvCover.setImageURI(uri);
+        Uri imageUri = Uri.parse(item.getImageUrl());
+        holder.sdvCover.setImageURI(imageUri);
 
-        holder.tvName.setText(item.name);
+        holder.tvName.setText(item.getName());
 
         holder.mView.setOnClickListener(v ->
-                mListener.onSourceClicked(item.id)
+                mListener.onSourceClicked(item.getId())
         );
     }
 

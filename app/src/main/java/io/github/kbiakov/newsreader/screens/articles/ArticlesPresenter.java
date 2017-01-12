@@ -2,11 +2,11 @@ package io.github.kbiakov.newsreader.screens.articles;
 
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.github.kbiakov.newsreader.datasource.DataSource;
 import io.github.kbiakov.newsreader.models.entities.Article;
+import io.github.kbiakov.newsreader.models.entities.ArticleEntity;
 import io.github.kbiakov.newsreader.models.json.ArticleJson;
 import io.github.kbiakov.newsreader.models.response.ArticlesResponse;
 import io.github.kbiakov.newsreader.models.response.SortBy;
@@ -16,6 +16,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
+
+    // - interface
 
     void loadArticles(boolean pullToRefresh, String sourceId) {
         if (isViewAttached()) {
@@ -43,30 +45,28 @@ class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
         }
     }
 
+    // - Data source
+
     private Single<List<Article>> getArticles(String sourceId) {
-        Observable<List<Article>> db = Observable.defer(() -> Observable.just(DataSource.db()
-                .select(Article.class)
-                .where(Article.SOURCE_ID.eq(sourceId))
-                .get()
-                .toList()));
-
-        Observable<List<Article>> api = DataSource.api()
-                .getArticles(sourceId, SortBy.TOP)
-                .map(ArticlesResponse::getData)
-                .map(a -> toEntity(a, sourceId))
-                .doOnNext(DataSource::saveArticles);
-
-        return Observable.concat(db, api)
+        return Observable.concat(getFromDb(sourceId), getFromNetwork(sourceId))
                 .first(DataSource.emptyArticles());
     }
 
-    private List<Article> toEntity(List<ArticleJson> articles, String sourceId) {
-        List<Article> res = new ArrayList<>();
-        for (ArticleJson json: articles) {
-            Article a = (Article) json;
-            a.setSourceId(sourceId);
-            res.add(a);
-        }
-        return res;
+    private Observable<List<Article>> getFromDb(String sourceId) {
+        return DataSource.db()
+                .select(Article.class)
+                .where(ArticleEntity.SOURCE_ID.eq(sourceId))
+                .get()
+                .observable()
+                .toList()
+                .toObservable();
+    }
+
+    private Observable<List<Article>> getFromNetwork(String sourceId) {
+        return DataSource.api()
+                .getArticles(sourceId, SortBy.TOP)
+                .map(ArticlesResponse::getData)
+                .map(a -> ArticleJson.asEntities(a, sourceId))
+                .doOnNext(DataSource::saveArticles);
     }
 }

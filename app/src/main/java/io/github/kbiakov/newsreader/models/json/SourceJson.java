@@ -1,38 +1,37 @@
 package io.github.kbiakov.newsreader.models.json;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
 import com.bluelinelabs.logansquare.annotation.JsonField;
 import com.bluelinelabs.logansquare.annotation.JsonObject;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import io.github.kbiakov.newsreader.models.entities.Source;
+import io.github.kbiakov.newsreader.models.entities.SourceEntity;
 
 @JsonObject
 public class SourceJson {
-    public @JsonField String id;
-    public @JsonField String name;
-    public @JsonField String description;
-    public @JsonField String url;
-    public @JsonField String category;
-    public @JsonField String language;
-    public @JsonField String country;
-    public @JsonField ImageUrl urlsToLogos;
-    public @JsonField List<String> sortBysAvailable;
+    @JsonField public String id;
+    @JsonField public String name;
+    @JsonField public ImageUrlJson urlsToLogos;
 
-    @Nullable
-    public String getImageUrl() {
-        return urlsToLogos.getUrl();
+    @NonNull
+    private Source toEntity() {
+        Source s = new SourceEntity();
+        s.setId(id);
+        s.setName(name);;
+        s.setImageUrl(urlsToLogos.getUrl());
+        return s;
     }
 
-    @JsonObject
-    public static class ImageUrl {
-        public @JsonField String small;
-        public @JsonField String medium;
-        public @JsonField String large;
-
-        @Nullable
-        public String getUrl() {
-            return large != null ? large : medium != null ? medium : small;
+    @NonNull
+    public static List<Source> asEntities(List<SourceJson> sources) {
+        List<Source> res = new ArrayList<>();
+        for (SourceJson source : sources) {
+            res.add(source.toEntity());
         }
+        return res;
     }
 }

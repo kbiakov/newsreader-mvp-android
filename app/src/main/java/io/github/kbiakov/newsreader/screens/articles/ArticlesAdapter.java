@@ -37,18 +37,18 @@ class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHolder>{
         Article item = mArticles.get(position);
         holder.mArticle = item;
 
-        Uri uri = Uri.parse(item.urlToImage);
+        Uri uri = Uri.parse(item.getUrlToImage());
         holder.sdvCover.setImageURI(uri);
         holder.ivNoPhoto.setVisibility(View.GONE);
 
-        holder.tvAuthor.setText(item.author);
-        holder.tvAuthor.setVisibility(item.author == null ? View.GONE : View.VISIBLE);
+        holder.tvAuthor.setText(item.getAuthor());
+        holder.tvAuthor.setVisibility(item.getAuthor() == null ? View.GONE : View.VISIBLE);
 
-        holder.tvTitle.setText(item.title);
-        holder.tvDescription.setText(item.description);
+        holder.tvTitle.setText(item.getTitle());
+        holder.tvDescription.setText(item.getDescription());
 
         holder.mView.setOnClickListener(v ->
-                mListener.onArticleClicked(item.url)
+                mListener.onArticleClicked(item.getUrl())
         );
     }
 
