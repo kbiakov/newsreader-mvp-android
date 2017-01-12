@@ -42,8 +42,7 @@ public class WebpageController extends MvpController<WebpageView, WebpagePresent
                 presenter.onPageLoaded();
             }
         });
-
-        presenter.loadPage(articleUrl);
+        wvPage.loadUrl(articleUrl);
 
         return view;
     }
