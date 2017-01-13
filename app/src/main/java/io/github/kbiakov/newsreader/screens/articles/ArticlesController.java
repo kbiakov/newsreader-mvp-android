@@ -16,6 +16,7 @@ import com.hannesdorfmann.mosby.conductor.viewstate.lce.MvpLceViewStateControlle
 import com.hannesdorfmann.mosby.mvp.viewstate.lce.LceViewState;
 import com.hannesdorfmann.mosby.mvp.viewstate.lce.data.RetainingLceViewState;
 
+import java.util.Collections;
 import java.util.List;
 
 import io.github.kbiakov.newsreader.R;
@@ -48,7 +49,7 @@ public class ArticlesController extends MvpLceViewStateController<SwipeRefreshLa
 
         errorView = (TextView) view.findViewById(R.id.errorView);
 
-        adapter = new ArticlesAdapter(DataSource.emptyArticles(),
+        adapter = new ArticlesAdapter(Collections.emptyList(),
                 url -> presenter.onArticleSelected(url)
         );
 

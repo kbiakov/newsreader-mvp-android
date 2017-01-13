@@ -15,6 +15,7 @@ import com.hannesdorfmann.mosby.conductor.viewstate.lce.MvpLceViewStateControlle
 import com.hannesdorfmann.mosby.mvp.viewstate.lce.LceViewState;
 import com.hannesdorfmann.mosby.mvp.viewstate.lce.data.RetainingLceViewState;
 
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -38,7 +39,7 @@ public class HomeController extends MvpLceViewStateController<SwipeRefreshLayout
 
         errorView = (TextView) view.findViewById(R.id.errorView);
 
-        adapter = new SourcesAdapter(DataSource.emptySources(),
+        adapter = new SourcesAdapter(Collections.emptyList(),
                 id -> presenter.onSourceSelected(id)
         );
 
