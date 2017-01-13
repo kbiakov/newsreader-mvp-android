@@ -1,7 +1,10 @@
 package io.github.kbiakov.newsreader.screens.articles;
 
+import android.util.Log;
+
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
+import java.net.UnknownHostException;
 import java.util.List;
 
 import io.github.kbiakov.newsreader.datasource.DataSource;
@@ -15,6 +18,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
+
+    private static final String TAG = "Articles";
 
     // - Interface
 
@@ -47,7 +52,7 @@ class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
     // - Data source
 
     private Observable<List<Article>> getArticles(String sourceId) {
-        return Observable.concat(getFromDb(sourceId), getFromNetwork(sourceId));
+        return getFromNetwork(sourceId).mergeWith(getFromDb(sourceId));
     }
 
     private Observable<List<Article>> getFromDb(String sourceId) {
@@ -57,14 +62,22 @@ class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
                 .get()
                 .observable()
                 .toList()
-                .toObservable();
+                .toObservable()
+                .doOnNext(s -> Log.e(TAG, "DB, " + s.size()));
     }
 
     private Observable<List<Article>> getFromNetwork(String sourceId) {
         return DataSource.api()
                 .getArticles(sourceId, SortBy.TOP)
+                .onErrorReturn(t -> {
+                    if (t instanceof UnknownHostException) {
+                        return ArticlesResponse.empty();
+                    }
+                    return ArticlesResponse.invalid(t);
+                })
                 .map(ArticlesResponse::getData)
                 .map(a -> ArticleJson.asEntities(a, sourceId))
-                .doOnNext(DataSource::saveArticles);
+                .doOnNext(DataSource::saveArticles)
+                .doOnNext(s -> Log.e(TAG, "API, " + s.size()));
     }
 }

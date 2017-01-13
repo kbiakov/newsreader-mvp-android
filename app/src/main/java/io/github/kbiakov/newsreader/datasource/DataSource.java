@@ -22,14 +22,6 @@ public class DataSource {
         return DbManager.getInstance().getData();
     }
 
-    public static List<Source> emptySources() {
-        return new ArrayList<>();
-    }
-
-    public static List<Article> emptyArticles() {
-        return new ArrayList<>();
-    }
-
     public static Disposable saveSources(List<Source> data) {
         return db().upsert(data).subscribe();
     }
