@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 
 import io.github.kbiakov.newsreader.R;
-import io.github.kbiakov.newsreader.datasource.DataSource;
 import io.github.kbiakov.newsreader.models.entities.Article;
 import io.github.kbiakov.newsreader.screens.webpage.WebpageController;
 

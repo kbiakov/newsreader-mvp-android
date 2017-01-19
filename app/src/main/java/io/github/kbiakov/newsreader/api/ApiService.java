@@ -1,4 +1,4 @@
-package io.github.kbiakov.newsreader.datasource.api;
+package io.github.kbiakov.newsreader.api;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

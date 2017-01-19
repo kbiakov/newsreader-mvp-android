@@ -18,8 +18,6 @@ import com.hannesdorfmann.mosby.mvp.viewstate.lce.data.RetainingLceViewState;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.ButterKnife;
-import io.github.kbiakov.newsreader.datasource.DataSource;
 import io.github.kbiakov.newsreader.screens.articles.ArticlesController;
 import io.github.kbiakov.newsreader.R;
 import io.github.kbiakov.newsreader.models.entities.Source;

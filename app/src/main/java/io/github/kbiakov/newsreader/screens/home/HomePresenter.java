@@ -7,18 +7,31 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import io.github.kbiakov.newsreader.datasource.DataSource;
+import javax.inject.Inject;
+
+import io.github.kbiakov.newsreader.App;
+import io.github.kbiakov.newsreader.api.ApiService;
 import io.github.kbiakov.newsreader.models.entities.Source;
 import io.github.kbiakov.newsreader.models.json.SourceJson;
 import io.github.kbiakov.newsreader.models.response.SourcesResponse;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.requery.Persistable;
+import io.requery.reactivex.ReactiveEntityStore;
 
-class HomePresenter extends MvpBasePresenter<HomeView> {
+public class HomePresenter extends MvpBasePresenter<HomeView> {
 
     private static final String TAG = "Sources";
+
+    @Inject ApiService apiService;
+    @Inject ReactiveEntityStore<Persistable> dbStore;
+
+    HomePresenter() {
+        App.getAppComponent().inject(this);
+    }
 
     // - Interface
 
@@ -55,7 +68,7 @@ class HomePresenter extends MvpBasePresenter<HomeView> {
     }
 
     private Observable<List<Source>> getFromDb() {
-        return DataSource.db()
+        return dbStore
                 .select(Source.class)
                 .get()
                 .observable()
@@ -65,17 +78,23 @@ class HomePresenter extends MvpBasePresenter<HomeView> {
     }
 
     private Observable<List<Source>> getFromNetwork() {
-        return DataSource.api()
+        return apiService
                 .getSources(null, null, null)
                 .onErrorReturn(t -> {
-                    if (t instanceof UnknownHostException) {
+                    if (t instanceof UnknownHostException) { // no internet
                         return SourcesResponse.empty();
                     }
                     return SourcesResponse.invalid(t);
                 })
                 .map(SourcesResponse::getData)
                 .map(SourceJson::asEntities)
-                .doOnNext(DataSource::saveSources)
+                .doOnNext(this::saveSources)
                 .doOnNext(s -> Log.e(TAG, "API, " + s.size()));
+    }
+
+    private Disposable saveSources(List<Source> sources) {
+        return dbStore
+                .upsert(sources)
+                .subscribe();
     }
 }

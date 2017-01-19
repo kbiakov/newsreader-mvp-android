@@ -1,4 +1,4 @@
-package io.github.kbiakov.newsreader.datasource.api.interceptors;
+package io.github.kbiakov.newsreader.api.interceptors;
 
 import java.io.IOException;
 
