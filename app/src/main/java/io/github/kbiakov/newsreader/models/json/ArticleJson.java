@@ -18,10 +18,12 @@ public class ArticleJson {
     @JsonField public String description;
     @JsonField public String url;
     @JsonField public String urlToImage;
+    @JsonField public String publishedAt;
 
     @NonNull
     private Article toEntity(String sourceId) {
         Article a = new ArticleEntity();
+        a.setId(createId(sourceId, publishedAt));
         a.setSourceId(sourceId);
         a.setAuthor(author);
         a.setTitle(title);
@@ -29,6 +31,10 @@ public class ArticleJson {
         a.setUrl(url);
         a.setUrlToImage(urlToImage);
         return a;
+    }
+
+    private static String createId(String sourceId, String publishedAt) {
+        return sourceId + "-" + publishedAt;
     }
 
     @NonNull

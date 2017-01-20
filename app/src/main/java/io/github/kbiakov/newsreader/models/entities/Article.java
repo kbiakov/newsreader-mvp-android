@@ -9,6 +9,9 @@ import io.requery.Persistable;
 @Entity
 public interface Article extends Parcelable, Persistable {
     @Key
+    String getId();
+    void setId(String id);
+
     String getSourceId();
     void setSourceId(String sourceId);
 

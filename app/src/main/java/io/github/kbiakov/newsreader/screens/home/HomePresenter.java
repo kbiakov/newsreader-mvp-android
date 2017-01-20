@@ -64,7 +64,7 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
     // - Data source
 
     private Observable<List<Source>> getSources() {
-        return getFromNetwork().mergeWith(getFromDb());
+        return getFromNetwork().concatWith(getFromDb());
     }
 
     private Observable<List<Source>> getFromDb() {

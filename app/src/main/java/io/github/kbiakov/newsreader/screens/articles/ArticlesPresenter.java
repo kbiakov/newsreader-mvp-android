@@ -65,7 +65,7 @@ public class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
     // - Data source
 
     private Observable<List<Article>> getArticles(String sourceId) {
-        return getFromNetwork(sourceId).mergeWith(getFromDb(sourceId));
+        return getFromNetwork(sourceId).concatWith(getFromDb(sourceId));
     }
 
     private Observable<List<Article>> getFromDb(String sourceId) {
