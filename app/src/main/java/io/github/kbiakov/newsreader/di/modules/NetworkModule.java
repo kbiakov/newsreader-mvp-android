@@ -1,6 +1,5 @@
 package io.github.kbiakov.newsreader.di.modules;
 
-import android.app.Application;
 import android.content.Context;
 
 import com.github.aurae.retrofit2.LoganSquareConverterFactory;
