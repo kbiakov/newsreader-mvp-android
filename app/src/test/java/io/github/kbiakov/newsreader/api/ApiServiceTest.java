@@ -4,13 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
-
 import io.github.kbiakov.newsreader.BaseTest;
-import io.github.kbiakov.newsreader.di.modules.NetworkModule;
 import io.github.kbiakov.newsreader.models.response.SourcesResponse;
 import io.reactivex.subscribers.TestSubscriber;
-import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -45,7 +41,7 @@ public class ApiServiceTest extends BaseTest {
             }
         });
 
-        //apiService = mock(ApiService.class);
+        apiService = mock(ApiService.class);
     }
 
     @Test

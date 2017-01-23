@@ -1,11 +1,8 @@
 package io.github.kbiakov.newsreader.models.response;
 
-import android.support.annotation.NonNull;
-
 import com.bluelinelabs.logansquare.annotation.JsonField;
 import com.bluelinelabs.logansquare.annotation.JsonObject;
 
-import java.util.Collections;
 import java.util.List;
 
 @JsonObject

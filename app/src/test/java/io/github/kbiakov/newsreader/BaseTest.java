@@ -9,7 +9,7 @@ import org.robolectric.annotation.Config;
 import io.github.kbiakov.newsreader.di.components.AppTestComponent;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(application = TestApp.class,
+@Config(application = AppTest.class,
         constants = BuildConfig.class,
         sdk = 21)
 @Ignore
