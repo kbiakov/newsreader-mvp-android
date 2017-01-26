@@ -6,15 +6,20 @@ import org.junit.Test;
 
 import io.github.kbiakov.newsreader.BaseTest;
 import io.github.kbiakov.newsreader.models.response.SourcesResponse;
-import io.reactivex.subscribers.TestSubscriber;
+import io.reactivex.observers.TestObserver;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
+import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class ApiServiceTest extends BaseTest {
+
+    private static final String ROUTE = ApiService.API_ENDPOINT + "/";
+    private static final String SOURCES = "sources";
+    private static final String ARTICLES = "articles";
 
     private MockWebServer server;
     private ApiService apiService;
@@ -30,12 +35,10 @@ public class ApiServiceTest extends BaseTest {
             public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
                 String path = request.getPath();
 
-                if (path.startsWith(ApiService.API_ENDPOINT + "/sources")) {
-                    return new MockResponse().setResponseCode(200)
-                            .setBody(testUtils.readJson("sources"));
-                } else if (path.startsWith(ApiService.API_ENDPOINT + "/articles")) {
-                    return new MockResponse().setResponseCode(200)
-                            .setBody(testUtils.readJson("articles"));
+                if (path.startsWith(ROUTE + SOURCES)) {
+                    return new MockResponse().setBody(testUtils.readJson(SOURCES));
+                } else if (path.startsWith(ROUTE + ARTICLES)) {
+                    return new MockResponse().setBody(testUtils.readJson(ARTICLES));
                 }
                 return new MockResponse().setResponseCode(404);
             }
@@ -46,11 +49,14 @@ public class ApiServiceTest extends BaseTest {
 
     @Test
     public void testGetSources() throws Exception {
-        TestSubscriber<SourcesResponse> testSubscriber = new TestSubscriber<>();
-        apiService.getSources(null, null, null).subscribe(testSubscriber);
+        TestObserver<SourcesResponse> test =
+                apiService.getSources(null, null, null).test();
 
-        testSubscriber.assertNoErrors();
-        testSubscriber.assertValueCount(1);
+        test.assertNoErrors();
+
+        test.
+
+        assertEquals(10, actual.size());
 
         /*
         List<SourcesResponse> actual = testSubscriber.getOnNextEvents().get(0);
@@ -60,11 +66,6 @@ public class ApiServiceTest extends BaseTest {
         assertEquals("andrey7mel/Android-Rate", actual.get(0).getFullName());
         assertEquals(26314692, actual.get(0).getId());
         */
-    }
-
-    @Test
-    public void testGetArticles() {
-        // TODO
     }
 
     /*
@@ -78,6 +79,11 @@ public class ApiServiceTest extends BaseTest {
         }
     }
     */
+
+    @Test
+    public void testGetArticles() {
+        // TODO
+    }
 
     @After
     public void tearDown() throws Exception {

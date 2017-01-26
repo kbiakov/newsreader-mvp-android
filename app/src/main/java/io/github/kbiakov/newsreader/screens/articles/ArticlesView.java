@@ -6,6 +6,6 @@ import java.util.List;
 
 import io.github.kbiakov.newsreader.models.entities.Article;
 
-interface ArticlesView extends MvpLceView<List<Article>> {
+public interface ArticlesView extends MvpLceView<List<Article>> {
     void showArticle(String articleUrl);
 }

@@ -20,6 +20,7 @@ public abstract class Response<T> {
     }
 
     public abstract List<T> getData() throws RuntimeException;
+    public abstract void setData(List<T> data) throws RuntimeException;
 
     private boolean isOk() {
         return status.equals(STATUS_OK);

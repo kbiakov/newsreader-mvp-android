@@ -60,7 +60,6 @@ public class NetworkModule {
     @Singleton
     Cache provideCache(Context context) {
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
-        Cache cache = new Cache(context.getCacheDir(), cacheSize);
-        return cache;
+        return new Cache(context.getCacheDir(), cacheSize);
     }
 }

@@ -11,8 +11,8 @@ import javax.inject.Inject;
 
 import io.github.kbiakov.newsreader.App;
 import io.github.kbiakov.newsreader.api.ApiService;
+import io.github.kbiakov.newsreader.db.DbStore;
 import io.github.kbiakov.newsreader.models.entities.Article;
-import io.github.kbiakov.newsreader.models.entities.ArticleEntity;
 import io.github.kbiakov.newsreader.models.json.ArticleJson;
 import io.github.kbiakov.newsreader.models.response.ArticlesResponse;
 import io.github.kbiakov.newsreader.models.response.SortBy;
@@ -20,15 +20,13 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.requery.Persistable;
-import io.requery.reactivex.ReactiveEntityStore;
 
 public class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
 
     private static final String TAG = "Articles";
 
     @Inject ApiService apiService;
-    @Inject ReactiveEntityStore<Persistable> dbStore;
+    @Inject DbStore dbStore;
 
     ArticlesPresenter() {
         App.getAppComponent().inject(this);
@@ -36,7 +34,7 @@ public class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
 
     // - Interface
 
-    void loadArticles(boolean pullToRefresh, String sourceId) {
+    public void loadArticles(boolean pullToRefresh, String sourceId) {
         if (isViewAttached()) {
             getView().showLoading(pullToRefresh);
         }
@@ -56,7 +54,7 @@ public class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
                 });
     }
 
-    void onArticleSelected(String articleUrl) {
+    public void onArticleSelected(String articleUrl) {
         if (isViewAttached()) {
             getView().showArticle(articleUrl);
         }
@@ -66,17 +64,6 @@ public class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
 
     private Observable<List<Article>> getArticles(String sourceId) {
         return getFromNetwork(sourceId).concatWith(getFromDb(sourceId));
-    }
-
-    private Observable<List<Article>> getFromDb(String sourceId) {
-        return dbStore
-                .select(Article.class)
-                .where(ArticleEntity.SOURCE_ID.eq(sourceId))
-                .get()
-                .observable()
-                .toList()
-                .toObservable()
-                .doOnNext(s -> Log.e(TAG, "DB, " + s.size()));
     }
 
     private Observable<List<Article>> getFromNetwork(String sourceId) {
@@ -90,13 +77,17 @@ public class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
                 })
                 .map(ArticlesResponse::getData)
                 .map(a -> ArticleJson.asEntities(a, sourceId))
-                .doOnNext(this::saveArticles)
-                .doOnNext(s -> Log.e(TAG, "API, " + s.size()));
+                .doOnNext(this::saveToDb)
+                .doOnNext(s -> Log.i(TAG, "API, " + s.size()));
     }
 
-    private Disposable saveArticles(List<Article> articles) {
+    private Observable<List<Article>> getFromDb(String sourceId) {
         return dbStore
-                .upsert(articles)
-                .subscribe();
+                .getArticles(sourceId)
+                .doOnNext(s -> Log.i(TAG, "DB, " + s.size()));
+    }
+
+    private Disposable saveToDb(List<Article> articles) {
+        return dbStore.saveArticles(articles);
     }
 }

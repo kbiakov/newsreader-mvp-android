@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 import io.github.kbiakov.newsreader.App;
 import io.github.kbiakov.newsreader.api.ApiService;
+import io.github.kbiakov.newsreader.db.DbStore;
 import io.github.kbiakov.newsreader.models.entities.Source;
 import io.github.kbiakov.newsreader.models.json.SourceJson;
 import io.github.kbiakov.newsreader.models.response.SourcesResponse;
@@ -19,15 +20,13 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.requery.Persistable;
-import io.requery.reactivex.ReactiveEntityStore;
 
 public class HomePresenter extends MvpBasePresenter<HomeView> {
 
     private static final String TAG = "Sources";
 
     @Inject ApiService apiService;
-    @Inject ReactiveEntityStore<Persistable> dbStore;
+    @Inject DbStore dbStore;
 
     HomePresenter() {
         App.getAppComponent().inject(this);
@@ -67,16 +66,6 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
         return getFromNetwork().concatWith(getFromDb());
     }
 
-    private Observable<List<Source>> getFromDb() {
-        return dbStore
-                .select(Source.class)
-                .get()
-                .observable()
-                .toList()
-                .toObservable()
-                .doOnNext(s -> Log.e(TAG, "DB, " + s.size()));
-    }
-
     private Observable<List<Source>> getFromNetwork() {
         return apiService
                 .getSources(null, null, null)
@@ -92,9 +81,13 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
                 .doOnNext(s -> Log.e(TAG, "API, " + s.size()));
     }
 
-    private Disposable saveSources(List<Source> sources) {
+    private Observable<List<Source>> getFromDb() {
         return dbStore
-                .upsert(sources)
-                .subscribe();
+                .getSources()
+                .doOnNext(s -> Log.e(TAG, "DB, " + s.size()));
+    }
+
+    private Disposable saveSources(List<Source> sources) {
+        return dbStore.saveSources(sources);
     }
 }

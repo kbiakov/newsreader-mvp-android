@@ -25,6 +25,7 @@ public class App extends Application {
         super.onCreate();
 
         appComponent = buildComponent();
+
         refWatcher = LeakCanary.install(this);
         StrictMode.enableDefaults();
         Fresco.initialize(this);
@@ -42,8 +43,8 @@ public class App extends Application {
     protected AppComponent buildComponent() {
         return DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
-                .cacheModule(new CacheModule())
                 .networkModule(new NetworkModule())
+                .cacheModule(new CacheModule())
                 .build();
     }
 }

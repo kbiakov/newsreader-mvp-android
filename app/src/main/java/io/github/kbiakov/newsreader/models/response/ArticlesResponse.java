@@ -16,7 +16,7 @@ public class ArticlesResponse extends Response<ArticleJson> {
     @JsonField String sortBy;
     @JsonField List<ArticleJson> articles;
 
-    ArticlesResponse() {
+    public ArticlesResponse() {
         super();
         this.source = "";
         this.sortBy = SortBy.TOP;
@@ -31,6 +31,12 @@ public class ArticlesResponse extends Response<ArticleJson> {
     public List<ArticleJson> getData() throws RuntimeException {
         checkStatus();
         return articles;
+    }
+
+    @Override
+    public void setData(List<ArticleJson> data) throws RuntimeException {
+        checkStatus();
+        this.articles = data;
     }
 
     @NonNull

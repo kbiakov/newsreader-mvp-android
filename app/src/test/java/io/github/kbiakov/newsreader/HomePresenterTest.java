@@ -10,6 +10,7 @@ import static org.mockito.Mockito.doAnswer;
 
 public class HomePresenterTest {
 
+    /*
     @Test
     public void testShowLoadingOnError() {
         doAnswer(invocation -> Observable.error(new Throwable(TestConst.TEST_ERROR)))
@@ -28,7 +29,8 @@ public class HomePresenterTest {
         verify(mockView).hideLoading();
     }
 
-    /*
+
+
     @Test
     public void sendTransfer_success() {
         // mock
