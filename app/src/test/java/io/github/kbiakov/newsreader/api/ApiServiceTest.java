@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.github.kbiakov.newsreader.BaseTest;
+import io.github.kbiakov.newsreader.models.response.ArticlesResponse;
 import io.github.kbiakov.newsreader.models.response.SourcesResponse;
 import io.reactivex.observers.TestObserver;
 import okhttp3.mockwebserver.Dispatcher;
@@ -12,7 +13,6 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
-import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class ApiServiceTest extends BaseTest {
@@ -20,6 +20,10 @@ public class ApiServiceTest extends BaseTest {
     private static final String ROUTE = ApiService.API_ENDPOINT + "/";
     private static final String SOURCES = "sources";
     private static final String ARTICLES = "articles";
+
+    private static final String SOURCE_ID = "the-next-web";
+    private static final int SOURCES_COUNT = 70;
+    private static final int ARTICLES_COUNT = 10;
 
     private MockWebServer server;
     private ApiService apiService;
@@ -33,11 +37,9 @@ public class ApiServiceTest extends BaseTest {
         server.setDispatcher(new Dispatcher() {
             @Override
             public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
-                String path = request.getPath();
-
-                if (path.startsWith(ROUTE + SOURCES)) {
+                if (request.getPath().startsWith(ROUTE + SOURCES)) {
                     return new MockResponse().setBody(testUtils.readJson(SOURCES));
-                } else if (path.startsWith(ROUTE + ARTICLES)) {
+                } else if (request.getPath().startsWith(ROUTE + ARTICLES)) {
                     return new MockResponse().setBody(testUtils.readJson(ARTICLES));
                 }
                 return new MockResponse().setResponseCode(404);
@@ -49,40 +51,26 @@ public class ApiServiceTest extends BaseTest {
 
     @Test
     public void testGetSources() throws Exception {
-        TestObserver<SourcesResponse> test =
+        TestObserver<SourcesResponse> testObserver =
                 apiService.getSources(null, null, null).test();
 
-        test.assertNoErrors();
+        testObserver.awaitTerminalEvent();
 
-        test.
-
-        assertEquals(10, actual.size());
-
-        /*
-        List<SourcesResponse> actual = testSubscriber.getOnNextEvents().get(0);
-
-        assertEquals(7, actual.size());
-        assertEquals("Android-Rate", actual.get(0).getName());
-        assertEquals("andrey7mel/Android-Rate", actual.get(0).getFullName());
-        assertEquals(26314692, actual.get(0).getId());
-        */
+        testObserver
+                .assertNoErrors()
+                .assertValue(l -> l.getData().size() == SOURCES_COUNT);
     }
-
-    /*
-    @Test
-    public void testGetSourcesIncorrect() throws Exception {
-        try {
-            apiInterface.getContributors("BBB", "AAA").subscribe();
-            fail();
-        } catch (Exception expected) {
-            assertEquals("HTTP 404 OK", expected.getMessage());
-        }
-    }
-    */
 
     @Test
     public void testGetArticles() {
-        // TODO
+        TestObserver<ArticlesResponse> testObserver =
+                apiService.getArticles(SOURCE_ID, null).test();
+
+        testObserver.awaitTerminalEvent();
+
+        testObserver
+                .assertNoErrors()
+                .assertValue(l -> l.getData().size() == ARTICLES_COUNT);
     }
 
     @After

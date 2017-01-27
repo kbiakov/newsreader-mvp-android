@@ -1,225 +1,188 @@
 package io.github.kbiakov.newsreader;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.github.kbiakov.newsreader.models.entities.Article;
-import io.github.kbiakov.newsreader.models.entities.ArticleEntity;
-import io.github.kbiakov.newsreader.models.json.ArticleJson;
 import io.github.kbiakov.newsreader.models.response.ArticlesResponse;
-import io.github.kbiakov.newsreader.models.response.SortBy;
 import io.github.kbiakov.newsreader.screens.articles.ArticlesPresenter;
 import io.github.kbiakov.newsreader.screens.articles.ArticlesView;
-import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
 
+import static io.github.kbiakov.newsreader.ArticlesMockProvider.*;
+import static io.reactivex.Observable.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ArticlesPresenterTest extends MvpPresenterTest<ArticlesView, ArticlesPresenter>
-        implements MockProvider<Article, ArticlesResponse> {
+public class ArticlesPresenterTest extends MvpPresenterTest<ArticlesView, ArticlesPresenter> {
+
+    private ArticlesMockProvider mock;
+
+    @Override
+    public void setUp() {
+        super.setUp();
+        mock = new ArticlesMockProvider(apiService, dbStore);
+    }
+
+    @Before
+    public void mockBeforeTest() {
+        when(mock.getFromNetwork()).thenReturn(
+                just(mock.mockResponse())
+        );
+        when(mock.getFromDb()).thenReturn(
+                just(mock.mockData())
+        );
+    }
+
+    private void testAfterFetchShouldPass() {
+        presenter.loadArticles(false, MOCK_SOURCE_ID);
+
+        verify(view).showLoading(false);
+        verify(view).setData(mock.mockData());
+        verify(view, never()).showError(any(Throwable.class), false);
+    }
+
+    private void testAfterFetchShouldFail(Throwable t) {
+        presenter.loadArticles(false, MOCK_SOURCE_ID);
+
+        verify(view).showLoading(false);
+        verify(view, never()).setData(any());
+        verify(view).showError(t, false);
+    }
 
     // - Interface tests
 
+    // api(1) db(1)
     @Test
-    void testLoadArticlesByInit() {
-        testLoadArticles(false);
-    }
+    void testLoadArticles() {
+        TestObserver<ArticlesResponse> testObserver = mock.getFromNetwork().test();
+        testObserver.awaitTerminalEvent();
+        testObserver
+                .assertNoErrors()
+                .assertValue(l -> l.getData().size() == MOCK_ARTICLES_COUNT);
 
-    @Test
-    void testLoadArticlesByRefreshing() {
-        testLoadArticles(true);
-    }
-
-    private void testLoadArticles(boolean pullToRefresh) {
-        when(getFromNetwork()).thenReturn(Observable.create(s -> {
-            s.onNext(mockResponse());
-            s.onComplete();
-        }));
-
-        when(getFromDb()).thenReturn(Observable.create(s -> {
-            s.onNext(mockData());
-            s.onComplete();
-        }));
-
-        presenter.loadArticles(pullToRefresh, MOCK_SOURCE_ID);
-
-        verify(view).showLoading(pullToRefresh);
-        verify(view).setData(mockData());
-        verify(view, never()).showError(any(Throwable.class), false);
+        testAfterFetchShouldPass();
     }
 
     @Test
     void testOnArticleSelected() {
         presenter.onArticleSelected(MOCK_ARTICLE_URL);
+
         verify(view).showArticle(MOCK_ARTICLE_URL);
-        verify(view, never()).showError(any(Throwable.class), true);
+        verify(view, never()).showError(any(Throwable.class), false);
     }
 
     // - Data source tests
 
-    @Override
-    public void getFromNetwork_Success() {
-        when(getFromNetwork()).thenReturn(Observable.create(s -> {
-            s.onNext(mockResponse());
-            s.onComplete();
-        }));
-    }
-
-    @Override
-    public void getFromNetwork_NoInternet() {
-        when(getFromNetwork()).thenReturn(noInternetError());
-
-        // TODO
-    }
-
+    // api(0) db(1)
     @Override
     public void getFromNetwork_Empty() {
-        when(getFromNetwork()).thenReturn(Observable.create(s -> {
-            s.onNext(emptyResponse());
-            s.onComplete();
-        }));
+        when(mock.getFromNetwork()).thenReturn(
+                just(mock.emptyResponse())
+        );
 
-        // TODO
+        TestObserver<ArticlesResponse> testObserver = mock.getFromNetwork().test();
+        testObserver.awaitTerminalEvent();
+        testObserver
+                .assertNoErrors()
+                .assertValue(l -> l.getData().isEmpty());
+
+        testAfterFetchShouldPass();
     }
 
+    // api(0) db(1)
+    @Override
+    public void getFromNetwork_NoInternet() {
+        when(mock.getFromNetwork()).thenReturn(
+                mock.noInternetError()
+        );
+
+        TestObserver<ArticlesResponse> testObserver = mock.getFromNetwork().test();
+        testObserver.awaitTerminalEvent();
+        testObserver.assertError(UnknownHostException.class);
+
+        testAfterFetchShouldPass();
+    }
+
+    // api(-1) db(1)
     @Override
     public void getFromNetwork_Fail() {
-        when(getFromNetwork()).thenReturn(Observable.create(s -> {
-            s.onNext(invalidResponse());
-            s.onComplete();
-        }));
+        when(mock.getFromNetwork()).thenReturn(
+                just(mock.invalidResponse())
+        );
 
-        // TODO
+        TestObserver<ArticlesResponse> testObserver = mock.getFromNetwork().test();
+        testObserver.awaitTerminalEvent();
+        testObserver.assertError(any(Throwable.class));
+
+        testAfterFetchShouldFail(new RuntimeException());
     }
 
+    // api(1) db(1)
     @Override
     public void getFromDb_Success() {
-        when(getFromDb()).thenReturn(Observable.create(s -> {
-            s.onNext(mockData());
-            s.onComplete();
-        }));
+        TestObserver<List<Article>> testObserver = mock.getFromDb().test();
+        testObserver.awaitTerminalEvent();
+        testObserver
+                .assertNoErrors()
+                .assertValue(l -> l.size() == MOCK_ARTICLES_COUNT);
 
-        // TODO
+        testAfterFetchShouldPass();
     }
 
+    // api(1) db(0)
     @Override
     public void getFromDb_Empty() {
-        when(getFromDb()).thenReturn(Observable.create(s -> {
-            s.onNext(emptyData());
-            s.onComplete();
-        }));
+        when(mock.getFromDb()).thenReturn(
+                just(mock.emptyData())
+        );
 
-        // TODO
+        TestObserver<List<Article>> testObserver = mock.getFromDb().test();
+        testObserver.awaitTerminalEvent();
+        testObserver
+                .assertNoErrors()
+                .assertValue(List::isEmpty);
+
+        testAfterFetchShouldPass();
     }
 
     @Override
     public void saveToDb_Success() {
-        when(dbStore.saveArticles(mockData()));
+        TestObserver<Iterable<Article>> testObserver = mock.saveToDb().test();
+        testObserver.awaitTerminalEvent();
+        testObserver.assertNoErrors();
 
-        // TODO
+        testAfterFetchShouldPass();
     }
 
+    // api(0) db(0)
     @Override
-    public void getFromAnywhere_Success() {
-        // TODO
+    void getFromNetworkAndDb_NoInternetAndEmptyCache() {
+        when(mock.getFromNetwork()).thenReturn(
+                mock.noInternetError()
+        );
+        when(mock.getFromDb()).thenReturn(
+                just(mock.emptyData())
+        );
+
+        testAfterFetchShouldFail(null);
     }
 
+    // api(0) db(0)
     @Override
-    public void getFromAnywhere_Empty() {
-        // TODO
+    void getFromNetworkAndDb_Empty() {
+        when(mock.getFromNetwork()).thenReturn(
+                just(mock.emptyResponse())
+        );
+        when(mock.getFromDb()).thenReturn(
+                just(mock.emptyData())
+        );
+
+        testAfterFetchShouldFail(null);
     }
-
-    // - Mock provider
-
-    @Override
-    public Observable<ArticlesResponse> getFromNetwork() {
-        return apiService.getArticles(MOCK_SOURCE_ID, SortBy.TOP);
-    }
-
-    @Override
-    public Observable<List<Article>> getFromDb() {
-        return dbStore.getArticles(MOCK_SOURCE_ID);
-    }
-
-    @Override
-    public ArticlesResponse mockResponse() {
-        ArticlesResponse res = new ArticlesResponse();
-        List<ArticleJson> articlesJson = new ArrayList<>();
-        for (int i = 0; i < MOCK_ITEMS_COUNT; i++) {
-            articlesJson.add(new ArticleJson());
-        }
-        res.setData(articlesJson);
-        return res;
-    }
-
-    @Override
-    public ArticlesResponse emptyResponse() {
-        return ArticlesResponse.empty();
-    }
-
-    @Override
-    public ArticlesResponse invalidResponse() {
-        return ArticlesResponse.invalid(any(Throwable.class));
-    }
-
-    @Override
-    public List<Article> mockData() {
-        List<Article> articles = new ArrayList<>();
-        for (int i = 0; i < MOCK_ITEMS_COUNT; i++) {
-            articles.add(new ArticleEntity());
-        }
-        return articles;
-    }
-
-    @Override
-    public List<Article> emptyData() {
-        return Collections.emptyList();
-    }
-
-    // - Method aliases
-
-    private Observable<ArticlesResponse> noInternetError() {
-        return Observable.error(new UnknownHostException());
-    }
-
-    /*
-    @Override
-    public void performGetFromNetwork_success() {
-
-        when(apiService.getArticles(sourceId, null))
-                .thenReturn(Observable.create(s -> {
-                    s.onNext(ArticlesResponse.empty());
-                    s.onComplete();
-                }));
-
-        when(apiService.getArticles(sourceId, null)).thenReturn(noInternetError());
-
-        presenter.getFromNetwork(sourceId);
-
-        //verify(logger).print("ABC");
-    }
-
-    @Override
-    public void performGetFromNetwork_failed_noInternet() {
-        String sourceId = "";
-
-        when(apiService.getArticles(sourceId, null))
-                .thenReturn(Observable.create(s -> {
-                    s.onNext(ArticlesResponse.empty());
-                    s.onComplete();
-                }));
-
-        when(apiService.getArticles(sourceId, null)).thenReturn(noInternetError());
-
-        presenter.getFromNetwork(sourceId);
-
-        //verify(logger).print("ABC");
-    }
-    */
 }

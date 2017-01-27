@@ -44,10 +44,15 @@ public class CacheModule {
             }
 
             @Override
-            public Disposable saveSources(List<Source> sources) {
+            public Observable<Iterable<Source>> saveSourcesDefault(List<Source> sources) {
                 return entityStore
                         .upsert(sources)
-                        .subscribe();
+                        .toObservable();
+            }
+
+            @Override
+            public Disposable saveSources(List<Source> sources) {
+                return saveSourcesDefault(sources).subscribe();
             }
 
             @Override
@@ -62,10 +67,15 @@ public class CacheModule {
             }
 
             @Override
-            public Disposable saveArticles(List<Article> articles) {
+            public Observable<Iterable<Article>> saveArticlesDefault(List<Article> articles) {
                 return entityStore
                         .upsert(articles)
-                        .subscribe();
+                        .toObservable();
+            }
+
+            @Override
+            public Disposable saveArticles(List<Article> articles) {
+                return saveArticlesDefault(articles).subscribe();
             }
         };
     }
