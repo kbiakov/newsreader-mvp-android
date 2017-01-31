@@ -19,7 +19,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ArticlesPresenterTest extends MvpPresenterTest<ArticlesView, ArticlesPresenter> {
+public class HzPresenterTest extends MvpPresenterTest<ArticlesView, ArticlesPresenter> {
 
     private ArticlesMockProvider mock;
 
@@ -27,6 +27,11 @@ public class ArticlesPresenterTest extends MvpPresenterTest<ArticlesView, Articl
     public void setUp() {
         super.setUp();
         mock = new ArticlesMockProvider(apiService, dbStore);
+    }
+
+    @Override
+    void getFromNetwork_Success() {
+        // ???
     }
 
     @Before

@@ -19,13 +19,13 @@ import io.github.kbiakov.newsreader.db.DbStore;
 /**
  *** api(1) db(1)
  ** api(1) db(0)
- * api(1) db(-1)
+ *e api(1) db(-1)
  *** api(0) db(1)
  *** api(0) db(0)
- * api(0) db(-1)
+ *e api(0) db(-1)
  ** api(-1) db(1)
- * api(-1) db(0)
- * api(-1) db(-1)
+ *e api(-1) db(0)
+ *e api(-1) db(-1)
  *
  * saving error
  */
@@ -52,6 +52,7 @@ abstract class MvpPresenterTest<V extends MvpView, P extends MvpBasePresenter<V>
         presenter.detachView(true);
     }
 
+    /*
     @Test abstract void getFromNetwork_Success();
     @Test abstract void getFromNetwork_Empty();
     @Test abstract void getFromNetwork_NoInternet();
@@ -63,4 +64,5 @@ abstract class MvpPresenterTest<V extends MvpView, P extends MvpBasePresenter<V>
 
     @Test abstract void getFromNetworkAndDb_NoInternetAndEmptyCache();
     @Test abstract void getFromNetworkAndDb_Empty();
+    */
 }

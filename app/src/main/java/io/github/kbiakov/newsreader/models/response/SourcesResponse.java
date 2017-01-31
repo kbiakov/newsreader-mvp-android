@@ -14,7 +14,7 @@ import io.github.kbiakov.newsreader.models.json.SourceJson;
 public class SourcesResponse extends Response<SourceJson> {
     @JsonField List<SourceJson> sources;
 
-    SourcesResponse() {
+    public SourcesResponse() {
         super();
         this.sources = Collections.emptyList();
     }
@@ -27,6 +27,12 @@ public class SourcesResponse extends Response<SourceJson> {
     public List<SourceJson> getData() throws RuntimeException {
         checkStatus();
         return sources;
+    }
+
+    @Override
+    public void setData(List<SourceJson> data) throws RuntimeException {
+        checkStatus();
+        this.sources = data;
     }
 
     @NonNull

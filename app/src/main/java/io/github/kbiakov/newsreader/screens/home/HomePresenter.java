@@ -4,17 +4,14 @@ import android.util.Log;
 
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
-import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.github.kbiakov.newsreader.App;
-import io.github.kbiakov.newsreader.api.ApiService;
+import io.github.kbiakov.newsreader.api.providers.SourcesProvider;
 import io.github.kbiakov.newsreader.db.DbStore;
 import io.github.kbiakov.newsreader.models.entities.Source;
-import io.github.kbiakov.newsreader.models.json.SourceJson;
-import io.github.kbiakov.newsreader.models.response.SourcesResponse;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -25,8 +22,8 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
 
     private static final String TAG = "Sources";
 
-    @Inject ApiService apiService;
-    @Inject DbStore dbStore;
+    @Inject SourcesProvider api;
+    @Inject DbStore db;
 
     HomePresenter() {
         App.getAppComponent().inject(this);
@@ -67,27 +64,19 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
     }
 
     private Observable<List<Source>> getFromNetwork() {
-        return apiService
-                .getSources(null, null, null)
-                .onErrorReturn(t -> {
-                    if (t instanceof UnknownHostException) { // no internet
-                        return SourcesResponse.empty();
-                    }
-                    return SourcesResponse.invalid(t);
-                })
-                .map(SourcesResponse::getData)
-                .map(SourceJson::asEntities)
+        return api
+                .getSources()
                 .doOnNext(this::saveSources)
-                .doOnNext(s -> Log.e(TAG, "API, " + s.size()));
+                .doOnNext(s -> Log.i(TAG, "API, " + s.size()));
     }
 
     private Observable<List<Source>> getFromDb() {
-        return dbStore
+        return db
                 .getSources()
-                .doOnNext(s -> Log.e(TAG, "DB, " + s.size()));
+                .doOnNext(s -> Log.i(TAG, "DB, " + s.size()));
     }
 
     private Disposable saveSources(List<Source> sources) {
-        return dbStore.saveSources(sources);
+        return db.saveSources(sources);
     }
 }

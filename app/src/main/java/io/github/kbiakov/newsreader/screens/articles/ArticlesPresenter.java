@@ -4,18 +4,14 @@ import android.util.Log;
 
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
-import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.github.kbiakov.newsreader.App;
-import io.github.kbiakov.newsreader.api.ApiService;
+import io.github.kbiakov.newsreader.api.providers.ArticlesProvider;
 import io.github.kbiakov.newsreader.db.DbStore;
 import io.github.kbiakov.newsreader.models.entities.Article;
-import io.github.kbiakov.newsreader.models.json.ArticleJson;
-import io.github.kbiakov.newsreader.models.response.ArticlesResponse;
-import io.github.kbiakov.newsreader.models.response.SortBy;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -25,8 +21,8 @@ public class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
 
     private static final String TAG = "Articles";
 
-    @Inject ApiService apiService;
-    @Inject DbStore dbStore;
+    @Inject ArticlesProvider api;
+    @Inject DbStore db;
 
     ArticlesPresenter() {
         App.getAppComponent().inject(this);
@@ -67,27 +63,19 @@ public class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
     }
 
     private Observable<List<Article>> getFromNetwork(String sourceId) {
-        return apiService
-                .getArticles(sourceId, SortBy.TOP)
-                .onErrorReturn(t -> {
-                    if (t instanceof UnknownHostException) { // no internet
-                        return ArticlesResponse.empty();
-                    }
-                    return ArticlesResponse.invalid(t);
-                })
-                .map(ArticlesResponse::getData)
-                .map(a -> ArticleJson.asEntities(a, sourceId))
+        return api
+                .getArticles(sourceId)
                 .doOnNext(this::saveToDb)
                 .doOnNext(s -> Log.i(TAG, "API, " + s.size()));
     }
 
     private Observable<List<Article>> getFromDb(String sourceId) {
-        return dbStore
+        return db
                 .getArticles(sourceId)
                 .doOnNext(s -> Log.i(TAG, "DB, " + s.size()));
     }
 
     private Disposable saveToDb(List<Article> articles) {
-        return dbStore.saveArticles(articles);
+        return db.saveArticles(articles);
     }
 }

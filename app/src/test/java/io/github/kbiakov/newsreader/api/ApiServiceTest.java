@@ -4,7 +4,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.github.kbiakov.newsreader.BaseTest;
 import io.github.kbiakov.newsreader.models.response.ArticlesResponse;
 import io.github.kbiakov.newsreader.models.response.SourcesResponse;
 import io.reactivex.observers.TestObserver;
