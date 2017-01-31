@@ -23,7 +23,7 @@ import static io.reactivex.Observable.just;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public abstract class ProviderTest<R extends Response<?>> {
+abstract class ProviderTest<R extends Response<?>> {
 
     @Rule MockitoRule rule = MockitoJUnit.rule();
 

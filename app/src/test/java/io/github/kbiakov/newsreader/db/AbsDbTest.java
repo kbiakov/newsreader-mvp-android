@@ -17,7 +17,7 @@ import io.reactivex.observers.TestObserver;
 import static io.reactivex.Observable.just;
 import static org.mockito.Mockito.when;
 
-abstract class DbTest<M> {
+abstract class AbsDbTest<M> {
 
     @Rule MockitoRule rule = MockitoJUnit.rule();
 

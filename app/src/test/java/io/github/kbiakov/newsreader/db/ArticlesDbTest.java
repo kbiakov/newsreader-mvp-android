@@ -1,6 +1,5 @@
 package io.github.kbiakov.newsreader.db;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.github.kbiakov.newsreader.api.mocks.ArticlesMock;
@@ -9,10 +8,10 @@ import io.reactivex.Observable;
 
 import static io.github.kbiakov.newsreader.api.mocks.ArticlesMock.MOCK_SOURCE_ID;
 
-public class ArticlesDbTest extends DbTest<Article> {
+public class ArticlesDbTest extends AbsDbTest<Article> {
     @Override
     List<Article> mockData() {
-        return ArticlesMock.create();
+        return ArticlesMock.createData();
     }
 
     @Override

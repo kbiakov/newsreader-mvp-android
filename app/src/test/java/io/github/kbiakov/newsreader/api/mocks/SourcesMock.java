@@ -28,7 +28,7 @@ public class SourcesMock implements IMock<SourcesResponse> {
         return sourceJsons;
     }
 
-    public static List<Source> create() {
+    public static List<Source> createData() {
         List<Source> sources = new ArrayList<>();
         for (int i = 0; i < MOCK_SOURCES_COUNT; i++) {
             sources.add(new SourceEntity());

@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import io.github.kbiakov.newsreader.App;
 import io.github.kbiakov.newsreader.api.providers.ArticlesProvider;
 import io.github.kbiakov.newsreader.db.DbStore;
+import io.github.kbiakov.newsreader.db.NoDataException;
 import io.github.kbiakov.newsreader.models.entities.Article;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -39,7 +40,9 @@ public class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(s -> {
-                    if (isViewAttached()) {
+                    if (s.isEmpty()) {
+                        getView().showError(NoDataException.create(), pullToRefresh);
+                    } else {
                         getView().setData(s);
                         getView().showContent();
                     }

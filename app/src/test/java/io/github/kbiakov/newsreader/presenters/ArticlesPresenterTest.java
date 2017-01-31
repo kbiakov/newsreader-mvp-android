@@ -1,20 +1,11 @@
 package io.github.kbiakov.newsreader.presenters;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 
 import java.util.List;
 
-import io.github.kbiakov.newsreader.api.ApiService;
 import io.github.kbiakov.newsreader.api.mocks.ArticlesMock;
-import io.github.kbiakov.newsreader.db.DbStore;
+import io.github.kbiakov.newsreader.api.mocks.IMock;
 import io.github.kbiakov.newsreader.models.entities.Article;
 import io.github.kbiakov.newsreader.models.response.ArticlesResponse;
 import io.github.kbiakov.newsreader.models.response.SortBy;
@@ -24,73 +15,49 @@ import io.reactivex.Observable;
 
 import static io.github.kbiakov.newsreader.api.mocks.ArticlesMock.MOCK_ARTICLE_URL;
 import static io.github.kbiakov.newsreader.api.mocks.ArticlesMock.MOCK_SOURCE_ID;
-import static io.reactivex.Observable.just;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-public class ArticlesPresenterTest {
+public class ArticlesPresenterTest extends AbsPresenterTest<Article, ArticlesResponse, ArticlesView, ArticlesPresenter> {
 
-    @Rule MockitoRule mockitoRule = MockitoJUnit.rule();
+    // - Mock
 
-    @Mock ApiService api;
-    @Mock DbStore db;
-    @Mock ArticlesView view;
-    @InjectMocks ArticlesPresenter presenter;
-
-    private final ArticlesMock mock = new ArticlesMock();
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    @Override
+    IMock<ArticlesResponse> createMock() {
+        return new ArticlesMock();
     }
 
-    @Before
-    public void attachView() {
-        presenter.attachView(view);
+    @Override
+    List<Article> createMockData() {
+        return ArticlesMock.createData();
     }
 
-    @After
-    public void detachView() {
-        presenter.detachView(true);
-    }
+    // - Interface
 
-    // - Interface tests
-
-    @Test
-    void testLoadArticles() {
-        when(makeApiRequest()).thenReturn(
-                just(mock.mockResponse())
-        );
-        when(fetchFromDb()).thenReturn(
-                just(ArticlesMock.create())
-        );
-
+    @Override
+    void togglePresenterForLoad() {
         presenter.loadArticles(false, MOCK_SOURCE_ID);
-
-        verify(view).showLoading(false);
-        verify(view).setData(ArticlesMock.create());
-        verify(view, never()).showError(any(Throwable.class), false);
     }
 
     @Test
-    void testOnArticleSelected() {
+    @Override
+    void testOnSomethingSelected() {
         presenter.onArticleSelected(MOCK_ARTICLE_URL);
 
         verify(view).showArticle(MOCK_ARTICLE_URL);
         verify(view, never()).showError(any(Throwable.class), false);
     }
 
-    // - Test cases
-
     // - Data source
 
-    private Observable<ArticlesResponse> makeApiRequest() {
+    @Override
+    Observable<ArticlesResponse> makeApiRequest() {
         return api.getArticles(MOCK_SOURCE_ID, SortBy.TOP).toObservable();
     }
 
-    private Observable<List<Article>> fetchFromDb() {
+    @Override
+    Observable<List<Article>> fetchFromDb() {
         return db.getArticles(MOCK_SOURCE_ID);
     }
 }

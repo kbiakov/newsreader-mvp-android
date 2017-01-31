@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import io.github.kbiakov.newsreader.App;
 import io.github.kbiakov.newsreader.api.providers.SourcesProvider;
 import io.github.kbiakov.newsreader.db.DbStore;
+import io.github.kbiakov.newsreader.db.NoDataException;
 import io.github.kbiakov.newsreader.models.entities.Source;
 
 import io.reactivex.Observable;
@@ -31,7 +32,7 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
 
     // - Interface
 
-    void loadSources(final boolean pullToRefresh) {
+    public void loadSources(final boolean pullToRefresh) {
         if (isViewAttached()) {
             getView().showLoading(pullToRefresh);
         }
@@ -41,8 +42,12 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
                 .subscribeOn(Schedulers.io())
                 .subscribe(s -> {
                     if (isViewAttached()) {
-                        getView().setData(s);
-                        getView().showContent();
+                        if (s.isEmpty()) {
+                            getView().showError(NoDataException.create(), pullToRefresh);
+                        } else {
+                            getView().setData(s);
+                            getView().showContent();
+                        }
                     }
                 }, e -> {
                     if (isViewAttached()) {
@@ -51,7 +56,7 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
                 });
     }
 
-    void onSourceSelected(String sourceId) {
+    public void onSourceSelected(String sourceId) {
         if (isViewAttached()) {
             getView().listArticles(sourceId);
         }

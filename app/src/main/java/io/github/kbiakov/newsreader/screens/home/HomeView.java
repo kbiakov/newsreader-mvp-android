@@ -6,6 +6,6 @@ import java.util.List;
 
 import io.github.kbiakov.newsreader.models.entities.Source;
 
-interface HomeView extends MvpLceView<List<Source>> {
+public interface HomeView extends MvpLceView<List<Source>> {
     void listArticles(String sourceId);
 }

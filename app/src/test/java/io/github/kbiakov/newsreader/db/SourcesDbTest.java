@@ -6,10 +6,10 @@ import io.github.kbiakov.newsreader.api.mocks.SourcesMock;
 import io.github.kbiakov.newsreader.models.entities.Source;
 import io.reactivex.Observable;
 
-public class SourcesDbTest extends DbTest<Source> {
+public class SourcesDbTest extends AbsDbTest<Source> {
     @Override
     List<Source> mockData() {
-        return SourcesMock.create();
+        return SourcesMock.createData();
     }
 
     @Override
