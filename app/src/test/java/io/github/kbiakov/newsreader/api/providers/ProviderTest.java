@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 abstract class ProviderTest<R extends Response<?>> {
 
-    @Rule MockitoRule rule = MockitoJUnit.rule();
+    @Rule public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock ApiService apiService;
 
