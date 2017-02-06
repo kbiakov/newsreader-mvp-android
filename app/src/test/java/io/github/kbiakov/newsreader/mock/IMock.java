@@ -1,4 +1,4 @@
-package io.github.kbiakov.newsreader.api.mocks;
+package io.github.kbiakov.newsreader.mock;
 
 public interface IMock<R> {
     R mockResponse();

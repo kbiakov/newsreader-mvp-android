@@ -2,11 +2,11 @@ package io.github.kbiakov.newsreader.db;
 
 import java.util.List;
 
-import io.github.kbiakov.newsreader.api.mocks.ArticlesMock;
+import io.github.kbiakov.newsreader.mock.ArticlesMock;
 import io.github.kbiakov.newsreader.models.entities.Article;
 import io.reactivex.Observable;
 
-import static io.github.kbiakov.newsreader.api.mocks.ArticlesMock.MOCK_SOURCE_ID;
+import static io.github.kbiakov.newsreader.mock.ArticlesMock.MOCK_SOURCE_ID;
 
 public class ArticlesDbTest extends AbsDbTest<Article> {
     @Override

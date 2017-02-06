@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.github.kbiakov.newsreader.api.ApiService;
-import io.github.kbiakov.newsreader.api.mocks.IMock;
+import io.github.kbiakov.newsreader.mock.IMock;
 import io.github.kbiakov.newsreader.db.DbStore;
 import io.github.kbiakov.newsreader.db.NoDataException;
 import io.github.kbiakov.newsreader.models.response.Response;

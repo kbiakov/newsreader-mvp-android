@@ -35,4 +35,3 @@ public class MockitoConfiguration extends DefaultMockitoConfiguration {
         "\nwhen(" + s.substring(0, s.length() - 1) +
         ").thenReturn(" + className + ".just());");
   }
-}

@@ -1,11 +1,10 @@
-package io.github.kbiakov.newsreader.api.mocks;
+package io.github.kbiakov.newsreader.mock;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.github.kbiakov.newsreader.models.entities.Source;
 import io.github.kbiakov.newsreader.models.entities.SourceEntity;
-import io.github.kbiakov.newsreader.models.json.ArticleJson;
 import io.github.kbiakov.newsreader.models.json.SourceJson;
 import io.github.kbiakov.newsreader.models.response.SourcesResponse;
 

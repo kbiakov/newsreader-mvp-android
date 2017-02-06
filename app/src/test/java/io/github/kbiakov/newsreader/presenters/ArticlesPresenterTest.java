@@ -14,19 +14,20 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
 
-import io.github.kbiakov.newsreader.api.mocks.ArticlesMock;
-import io.github.kbiakov.newsreader.api.mocks.IMock;
+import io.github.kbiakov.newsreader.api.ApiService;
+import io.github.kbiakov.newsreader.mock.ArticlesMock;
 import io.github.kbiakov.newsreader.api.providers.ArticlesProvider;
 import io.github.kbiakov.newsreader.db.DbStore;
 import io.github.kbiakov.newsreader.db.NoDataException;
 import io.github.kbiakov.newsreader.models.entities.Article;
 import io.github.kbiakov.newsreader.models.response.ArticlesResponse;
+import io.github.kbiakov.newsreader.models.response.SortBy;
 import io.github.kbiakov.newsreader.screens.articles.ArticlesPresenter;
 import io.github.kbiakov.newsreader.screens.articles.ArticlesView;
 import io.reactivex.Observable;
 
-import static io.github.kbiakov.newsreader.api.mocks.ArticlesMock.MOCK_ARTICLE_URL;
-import static io.github.kbiakov.newsreader.api.mocks.ArticlesMock.MOCK_SOURCE_ID;
+import static io.github.kbiakov.newsreader.mock.ArticlesMock.MOCK_ARTICLE_URL;
+import static io.github.kbiakov.newsreader.mock.ArticlesMock.MOCK_SOURCE_ID;
 import static io.reactivex.Observable.error;
 import static io.reactivex.Observable.just;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,36 +37,13 @@ import static org.mockito.Mockito.when;
 
 public class ArticlesPresenterTest {
 
-    // - Mock
-
-    private IMock<ArticlesResponse> createMock() {
-        return new ArticlesMock();
-    }
-
-    private List<Article> createMockData() {
-        return ArticlesMock.createData();
-    }
-
-    // - Data source
-
-    private Observable<List<Article>> makeApiRequest() {
-        return api.getArticles(MOCK_SOURCE_ID);
-    }
-
-    private Observable<List<Article>> fetchFromDb() {
-        return db.getArticles(MOCK_SOURCE_ID);
-    }
-
-    // - Main
-
     @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock public ArticlesProvider api;
-    @Mock public DbStore db;
-    @Mock public ArticlesView view;
-    @InjectMocks public ArticlesPresenter presenter;
-
-    private final IMock<ArticlesResponse> mock = createMock();
+    @Mock ApiService api;
+    @InjectMocks ArticlesProvider provider;
+    @Mock DbStore db;
+    @Mock ArticlesView view;
+    @InjectMocks ArticlesPresenter presenter;
 
     @Before
     public void setUp() {
@@ -85,41 +63,49 @@ public class ArticlesPresenterTest {
     // - Interface
 
     @Test
-    public void testLoadSomething() {
+    public void testLoadArticles() {
         when(makeApiRequest()).thenReturn(
-                just(createMockData())
+                just(new ArticlesResponse())
         );
         when(fetchFromDb()).thenReturn(
-                just(createMockData())
+                just(ArticlesMock.createData())
         );
 
-        loadArticles();
+        presenter.loadArticles(false, MOCK_SOURCE_ID);
 
         verify(view).showLoading(false);
-        verify(view).setData(createMockData());
+        verify(view).setData(ArticlesMock.createData());
+        verify(view, never()).showError(any(Throwable.class), false);
+    }
+
+    @Test
+    public void testOnArticlesSelected() {
+        presenter.onArticleSelected(MOCK_ARTICLE_URL);
+
+        verify(view).showArticle(MOCK_ARTICLE_URL);
         verify(view, never()).showError(any(Throwable.class), false);
     }
 
     // - Test cases
 
     @Test
-    public void testLoad_NoInternet() {
+    public void testLoadArticles_NoInternet() {
         when(makeApiRequest()).thenReturn(
                 error(new UnknownHostException())
         );
         when(fetchFromDb()).thenReturn(
-                just(createMockData())
+                just(ArticlesMock.createData())
         );
 
-        loadArticles();
+        presenter.loadArticles(false, MOCK_SOURCE_ID);
 
         verify(view).showLoading(false);
-        verify(view).setData(createMockData());
+        verify(view).setData(ArticlesMock.createData());
         verify(view, never()).showError(any(Throwable.class), false);
     }
 
     @Test
-    public void testLoadSources_NoData() {
+    public void testLoadArticles_NoData() {
         when(makeApiRequest()).thenReturn(
                 error(new UnknownHostException())
         );
@@ -127,7 +113,7 @@ public class ArticlesPresenterTest {
                 just(Collections.emptyList())
         );
 
-        loadArticles();
+        presenter.loadArticles(false, MOCK_SOURCE_ID);
 
         verify(view).showLoading(false);
         verify(view, never()).setData(any());
@@ -137,44 +123,42 @@ public class ArticlesPresenterTest {
     @Test
     public void testLoadArticles_InternetError() {
         when(makeApiRequest()).thenReturn(
-                error(new RuntimeException("Something goes wrong."))
+                error(new RuntimeException("Something went wrong"))
         );
         when(fetchFromDb()).thenReturn(
-                just(createMockData())
+                just(ArticlesMock.createData())
         );
 
-        loadArticles();
+        presenter.loadArticles(false, MOCK_SOURCE_ID);
 
         verify(view).showLoading(false);
-        verify(view, never()).setData(createMockData());
+        verify(view, never()).setData(ArticlesMock.createData());
         verify(view).showError(any(Throwable.class), false);
     }
 
     @Test
     public void testLoadArticles_DbError() {
         when(makeApiRequest()).thenReturn(
-                just(createMockData())
+                just(new ArticlesResponse())
         );
         when(fetchFromDb()).thenReturn(
-                error(new RuntimeException("Something goes wrong."))
+                error(new RuntimeException("Something went wrong"))
         );
 
-        loadArticles();
+        presenter.loadArticles(false, MOCK_SOURCE_ID);
 
         verify(view).showLoading(false);
-        verify(view, never()).setData(createMockData());
+        verify(view, never()).setData(ArticlesMock.createData());
         verify(view).showError(any(Throwable.class), false);
     }
 
-    private void loadArticles() {
-        presenter.loadArticles(false, MOCK_SOURCE_ID);
+    // - Data source
+
+    private Observable<ArticlesResponse> makeApiRequest() {
+        return api.getArticles(MOCK_SOURCE_ID, SortBy.TOP).toObservable();
     }
 
-    @Test
-    public void testOnArticlesSelected() {
-        presenter.onArticleSelected(MOCK_ARTICLE_URL);
-
-        verify(view).showArticle(MOCK_ARTICLE_URL);
-        verify(view, never()).showError(any(Throwable.class), false);
+    private Observable<List<Article>> fetchFromDb() {
+        return db.getArticles(MOCK_SOURCE_ID);
     }
 }
