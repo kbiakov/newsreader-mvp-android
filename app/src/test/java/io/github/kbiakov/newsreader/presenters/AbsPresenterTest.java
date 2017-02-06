@@ -33,17 +33,17 @@ import static org.mockito.Mockito.when;
 
 abstract class AbsPresenterTest<M, R extends Response<?>, V extends MvpLceView<List<M>>, P extends MvpBasePresenter<V>> {
 
-    @Rule MockitoRule mockitoRule = MockitoJUnit.rule();
+    @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock ApiService api;
-    @Mock DbStore db;
-    @Mock V view;
-    @InjectMocks P presenter;
+    @Mock public ApiService api;
+    @Mock public DbStore db;
+    @Mock public V view;
+    @InjectMocks public P presenter;
 
     private final IMock<R> mock = createMock();
 
-    abstract IMock<R> createMock();
-    abstract List<M> createMockData();
+    public abstract IMock<R> createMock();
+    public abstract List<M> createMockData();
 
     @Before
     public void setUp() {
@@ -63,7 +63,7 @@ abstract class AbsPresenterTest<M, R extends Response<?>, V extends MvpLceView<L
     // - Interface
 
     @Test
-    void testLoadSomething() {
+    public void testLoadSomething() {
         when(makeApiRequest()).thenReturn(
                 just(mock.mockResponse())
         );
@@ -78,15 +78,15 @@ abstract class AbsPresenterTest<M, R extends Response<?>, V extends MvpLceView<L
         verify(view, never()).showError(any(Throwable.class), false);
     }
 
-    abstract void togglePresenterForLoad();
+    public abstract void togglePresenterForLoad();
 
     @Test
-    abstract void testOnSomethingSelected();
+    public abstract void testOnSomethingSelected();
 
     // - Test cases
 
     @Test
-    void testLoad_NoInternet() {
+    public void testLoad_NoInternet() {
         when(makeApiRequest()).thenReturn(
                 error(new UnknownHostException())
         );
@@ -102,7 +102,7 @@ abstract class AbsPresenterTest<M, R extends Response<?>, V extends MvpLceView<L
     }
 
     @Test
-    void testLoadSources_NoData() {
+    public void testLoadSources_NoData() {
         when(makeApiRequest()).thenReturn(
                 error(new UnknownHostException())
         );
@@ -118,7 +118,7 @@ abstract class AbsPresenterTest<M, R extends Response<?>, V extends MvpLceView<L
     }
 
     @Test
-    void testLoadArticles_InternetError() {
+    public void testLoadArticles_InternetError() {
         when(makeApiRequest()).thenReturn(
                 error(new RuntimeException("Something goes wrong."))
         );
@@ -134,7 +134,7 @@ abstract class AbsPresenterTest<M, R extends Response<?>, V extends MvpLceView<L
     }
 
     @Test
-    void testLoadArticles_DbError() {
+    public void testLoadArticles_DbError() {
         when(makeApiRequest()).thenReturn(
                 just(mock.mockResponse())
         );
@@ -151,7 +151,7 @@ abstract class AbsPresenterTest<M, R extends Response<?>, V extends MvpLceView<L
 
     // - Data source
 
-    abstract Observable<R> makeApiRequest();
+    public abstract Observable<R> makeApiRequest();
 
-    abstract Observable<List<M>> fetchFromDb();
+    public abstract Observable<List<M>> fetchFromDb();
 }

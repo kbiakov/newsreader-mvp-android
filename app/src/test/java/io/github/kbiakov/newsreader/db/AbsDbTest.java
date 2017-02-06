@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 
 abstract class AbsDbTest<M> {
 
-    @Rule MockitoRule rule = MockitoJUnit.rule();
+    @Rule public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock DbStore dbStore;
 

@@ -22,25 +22,25 @@ public class SourcesPresenterTest extends AbsPresenterTest<Source, SourcesRespon
     // - Mock
 
     @Override
-    IMock<SourcesResponse> createMock() {
+    public IMock<SourcesResponse> createMock() {
         return new SourcesMock();
     }
 
     @Override
-    List<Source> createMockData() {
+    public List<Source> createMockData() {
         return SourcesMock.createData();
     }
 
     // - Interface
 
     @Override
-    void togglePresenterForLoad() {
+    public void togglePresenterForLoad() {
         presenter.loadSources(false);
     }
 
     @Test
     @Override
-    void testOnSomethingSelected() {
+    public void testOnSomethingSelected() {
         presenter.onSourceSelected(MOCK_SOURCE_ID);
 
         verify(view).listArticles(MOCK_SOURCE_ID);
@@ -50,12 +50,12 @@ public class SourcesPresenterTest extends AbsPresenterTest<Source, SourcesRespon
     // - Data source
 
     @Override
-    Observable<SourcesResponse> makeApiRequest() {
+    public Observable<SourcesResponse> makeApiRequest() {
         return api.getSources(null, null, null).toObservable();
     }
 
     @Override
-    Observable<List<Source>> fetchFromDb() {
+    public Observable<List<Source>> fetchFromDb() {
         return db.getSources();
     }
 }

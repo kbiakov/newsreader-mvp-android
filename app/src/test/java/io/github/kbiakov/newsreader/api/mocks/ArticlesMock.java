@@ -30,11 +30,7 @@ public class ArticlesMock implements IMock<ArticlesResponse> {
     }
 
     public static List<Article> createData() {
-        List<Article> articles = new ArrayList<>();
-        for (int i = 0; i < MOCK_ARTICLES_COUNT; i++) {
-            articles.add(new ArticleEntity());
-        }
-        return articles;
+        return ArticleJson.asEntities(createJsons(), MOCK_SOURCE_ID);
     }
 
     @Override
