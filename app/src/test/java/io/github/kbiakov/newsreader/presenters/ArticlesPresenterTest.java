@@ -25,12 +25,12 @@ import io.github.kbiakov.newsreader.models.response.SortBy;
 import io.github.kbiakov.newsreader.screens.articles.ArticlesPresenter;
 import io.github.kbiakov.newsreader.screens.articles.ArticlesView;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static io.github.kbiakov.newsreader.mock.ArticlesMock.MOCK_ARTICLE_URL;
 import static io.github.kbiakov.newsreader.mock.ArticlesMock.MOCK_SOURCE_ID;
-import static io.reactivex.Observable.error;
-import static io.reactivex.Observable.just;
-import static org.mockito.ArgumentMatchers.any;
+
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,10 +65,10 @@ public class ArticlesPresenterTest {
     @Test
     public void testLoadArticles() {
         when(makeApiRequest()).thenReturn(
-                just(new ArticlesResponse())
+                Single.just(new ArticlesResponse())
         );
         when(fetchFromDb()).thenReturn(
-                just(ArticlesMock.createData())
+                Observable.just(ArticlesMock.createData())
         );
 
         presenter.loadArticles(false, MOCK_SOURCE_ID);
@@ -91,10 +91,10 @@ public class ArticlesPresenterTest {
     @Test
     public void testLoadArticles_NoInternet() {
         when(makeApiRequest()).thenReturn(
-                error(new UnknownHostException())
+                Single.error(new UnknownHostException())
         );
         when(fetchFromDb()).thenReturn(
-                just(ArticlesMock.createData())
+                Observable.just(ArticlesMock.createData())
         );
 
         presenter.loadArticles(false, MOCK_SOURCE_ID);
@@ -107,10 +107,10 @@ public class ArticlesPresenterTest {
     @Test
     public void testLoadArticles_NoData() {
         when(makeApiRequest()).thenReturn(
-                error(new UnknownHostException())
+                Single.error(new UnknownHostException())
         );
         when(fetchFromDb()).thenReturn(
-                just(Collections.emptyList())
+                Observable.just(Collections.emptyList())
         );
 
         presenter.loadArticles(false, MOCK_SOURCE_ID);
@@ -123,10 +123,10 @@ public class ArticlesPresenterTest {
     @Test
     public void testLoadArticles_InternetError() {
         when(makeApiRequest()).thenReturn(
-                error(new RuntimeException("Something went wrong"))
+                Single.error(new RuntimeException("Something went wrong"))
         );
         when(fetchFromDb()).thenReturn(
-                just(ArticlesMock.createData())
+                Observable.just(ArticlesMock.createData())
         );
 
         presenter.loadArticles(false, MOCK_SOURCE_ID);
@@ -139,10 +139,10 @@ public class ArticlesPresenterTest {
     @Test
     public void testLoadArticles_DbError() {
         when(makeApiRequest()).thenReturn(
-                just(new ArticlesResponse())
+                Single.just(new ArticlesResponse())
         );
         when(fetchFromDb()).thenReturn(
-                error(new RuntimeException("Something went wrong"))
+                Observable.error(new RuntimeException("Something went wrong"))
         );
 
         presenter.loadArticles(false, MOCK_SOURCE_ID);
@@ -154,8 +154,8 @@ public class ArticlesPresenterTest {
 
     // - Data source
 
-    private Observable<ArticlesResponse> makeApiRequest() {
-        return api.getArticles(MOCK_SOURCE_ID, SortBy.TOP).toObservable();
+    private Single<ArticlesResponse> makeApiRequest() {
+        return api.getArticles(MOCK_SOURCE_ID, SortBy.TOP);
     }
 
     private Observable<List<Article>> fetchFromDb() {

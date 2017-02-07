@@ -25,6 +25,12 @@ public class ArticlesPresenter extends MvpBasePresenter<ArticlesView> {
     @Inject ArticlesProvider api;
     @Inject DbStore db;
 
+    @Inject
+    ArticlesPresenter(ArticlesProvider api, DbStore db) {
+        this.api = api;
+        this.db = db;
+    }
+
     ArticlesPresenter() {
         App.getAppComponent().inject(this);
     }

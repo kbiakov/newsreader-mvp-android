@@ -13,7 +13,6 @@ import io.github.kbiakov.newsreader.screens.home.HomeView;
 import io.reactivex.Observable;
 
 import static io.github.kbiakov.newsreader.mock.ArticlesMock.MOCK_SOURCE_ID;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
